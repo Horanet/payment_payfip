@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Add progression information on migration script
 
 ## [10.0.1.2.3] - 2018-03-08
 ### Added
