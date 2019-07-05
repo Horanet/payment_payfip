@@ -18,10 +18,12 @@
     'init_xml': [],
     'update_xml': [],
     'data': [
-       'views/payment_tipiregie_templates.xml',
-       'views/payment_views.xml',
+        # Views must be before data to avoid loading issues
+        'views/payment_tipiregie_templates.xml',
+        'views/payment_views.xml',
 
-       'data/payment_acquirer.xml',
+        'data/payment_acquirer.xml',
+        'data/cron_check_drafts.xml',
     ],
     'demo': [
     ],

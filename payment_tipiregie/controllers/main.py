@@ -1,13 +1,13 @@
 # coding: utf8
 
+import logging
+import pprint
+import werkzeug
+
 from odoo import http
 from odoo.http import request
-from odoo.addons.payment.models.payment_acquirer import ValidationError
 
-import pprint
-import logging
-import werkzeug
-import urlparse
+from odoo.addons.payment.models.payment_acquirer import ValidationError
 
 _logger = logging.getLogger(__name__)
 

@@ -44,10 +44,7 @@ def migrate(cr, version):
                 if tx.acquirer_id.tipiregie_customer_number != 'dummy' \
                         and tx.tipiregie_operation_identifier \
                         and not tx.acquirer_reference:
-                    try:
-                        data = tx.acquirer_id.tipiregie_get_result_from_web_service(tx.tipiregie_operation_identifier)
-                    except:
-                        data = {}
+                    data = tx.acquirer_id.tipiregie_get_result_from_web_service(tx.tipiregie_operation_identifier)
 
                     if 'refdet' in data:
                         tx.write({'acquirer_reference': data.get('refdet', '')})
@@ -55,3 +52,4 @@ def migrate(cr, version):
             offset += limit
             _logger.info("{}/{} records computed".format(len(txs) if offset > len(txs) else offset, len(txs)))
 
+    pass
