@@ -23,6 +23,7 @@
         'views/payment_views.xml',
 
         'data/payment_acquirer.xml',
+        'data/draft_payments_recovered_mail.xml',
         'data/cron_check_drafts.xml',
     ],
     'demo': [

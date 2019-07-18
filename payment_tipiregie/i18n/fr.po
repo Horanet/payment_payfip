@@ -6,14 +6,51 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-12 15:15+0000\n"
-"PO-Revision-Date: 2018-09-12 15:15+0000\n"
+"POT-Creation-Date: 2019-07-19 09:13+0000\n"
+"PO-Revision-Date: 2019-07-19 09:13+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: payment_tipiregie
+#: model:mail.template,body_html:payment_tipiregie.mail_template_draft_payments_recovered
+msgid "\n"
+"<span>\n"
+"% set transactions = ctx and ctx['transactions'] or []\n"
+"</span>\n"
+"<p>Some TipiRégie payment transactions were in draft state from too long.</p>\n"
+"<p>\n"
+"Take a look at the list and the new state after verification:\n"
+"<ul>\n"
+"    % for tx in transactions:\n"
+"    <li>${tx.reference} from ${tx.create_date} with amount of ${tx.amount} is now ${tx.state}</li>\n"
+"    %endfor\n"
+"</ul>\n"
+"</p>"
+msgstr "\n"
+"<span>\n"
+"% set transactions = ctx and ctx['transactions'] or []\n"
+"</span>\n"
+"<p>Des transactions de paiement de TipiRégie sont restées dans l'état brouillon trop longtemps.</p>\n"
+"<p>\n"
+"Veuillez regarder la liste et les nouveaux statuts récupérés auprès de TipiRégie :\n"
+"<ul>\n"
+"    % for tx in transactions:\n"
+"    <li>${tx.reference} du ${tx.create_date} avec le montant de ${tx.amount} est maintenant ${tx.state}</li>\n"
+"    %endfor\n"
+"</ul>\n"
+"</p>"
+
+#. module: payment_tipiregie
+#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:282
+#, python-format
+msgid "\n"
+"Tipi server returned the following error: \"%s\""
+msgstr "\n"
+"Le serveur TipiRégie retourne l'erreur suivante : \"%s\""
 
 #. module: payment_tipiregie
 #: model:ir.ui.view,arch_db:payment_tipiregie.acquirer_form_tipiregie
@@ -61,19 +98,7 @@ msgid "Form action URL"
 msgstr "URL de renvoi du formulaire"
 
 #. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:222
-#, python-format
-msgid "It seems that the connection to the web service Tipi Régie is impossible.\n"
-"%s\n"
-"\n"
-"%s"
-msgstr "Il semblerait que la connection vers le web service Tipi Régie soit impossible.\n"
-"%s\n"
-"\n"
-"%s"
-
-#. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:215
+#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:249
 #, python-format
 msgid "It would appear that the customer number entered is not valid or that the Tipi Régie contract is not properly configured."
 msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat Tipi Régie n'est pas correctement configuré."
@@ -104,11 +129,11 @@ msgid "Return URL"
 msgstr "URL de retour"
 
 #. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:28
-#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:49
+#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:51
+#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:76
 #, python-format
 msgid "Tipi Regie: received data with missing idop!"
-msgstr "Tipi Regie: données reçues mais idop manquant !"
+msgstr "Tipi Régie : données reçues mais idop manquant !"
 
 #. module: payment_tipiregie
 #: model:payment.acquirer,name:payment_tipiregie.payment_acquirer_tipiregie
@@ -116,21 +141,20 @@ msgid "Tipi Régie"
 msgstr "Tipi Régie"
 
 #. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:219
-#, python-format
-msgid "Tipi server returned the following error: \"%s\""
-msgstr "Le serveur a retourné l'erreur suivante : \"%s\""
-
-#. module: payment_tipiregie
 #: model:ir.ui.view,arch_db:payment_tipiregie.transaction_form_tipiregie
 msgid "TipiRégie TX Details"
 msgstr "Détails TipiRégie"
 
 #. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:49
+#: model:mail.template,subject:payment_tipiregie.mail_template_draft_payments_recovered
+msgid "Tipi Régie: Draft payments recovered"
+msgstr "Tipi Régie : Récupération des paiements en brouillon"
+
+#. module: payment_tipiregie
+#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:65
 #, python-format
 msgid "TipiRégie: activation mode can be activate in test environment only and if the payment acquirer is published on the website."
-msgstr "TipiRégie : l'activation ne peut être effectuée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
+msgstr "TipiRégie : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
 
 #. module: payment_tipiregie
 #: model:payment.acquirer,pre_msg:payment_tipiregie.payment_acquirer_tipiregie

@@ -145,7 +145,7 @@ class TipiRegieTransaction(models.Model):
         return
 
     @api.model
-    def tipiregie_cron_check_draft_payment_transactions(self, number_of_days=1):
+    def tipiregie_cron_check_draft_payment_transactions(self, options={}):
         """Execute cron task to get all draft payments and check actual state
 
         Execute cron task to get all draft payments before number of days passed as argument and ask for Tipi Régie
@@ -154,7 +154,9 @@ class TipiRegieTransaction(models.Model):
         :param number_of_days: number of days (before today) to get draft transactions
         :type number_of_days: int
         """
-        number_of_days = int(number_of_days)
+        number_of_days = int(options.get('number_of_days', 1))
+        send_summary = bool(options.get('send_summary', False))
+
         if number_of_days < 1:
             number_of_days = 1
 
@@ -177,6 +179,9 @@ class TipiRegieTransaction(models.Model):
         for tx in transactions:
             self.env['payment.transaction'].form_feedback(tx.tipiregie_operation_identifier, 'tipiregie')
 
+        if send_summary:
+            mail_template = self.env.ref('payment_tipiregie.mail_template_draft_payments_recovered')
+            mail_template.with_context(transactions=transactions).send_mail(self.env.user.id)
     # endregion
 
     pass
