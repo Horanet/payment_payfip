@@ -7,7 +7,9 @@
     'license': "AGPL-3",
     'category': 'Accounting',
     'external_dependencies': {
-        'python': []
+        'python': [
+            'openupgradelib',
+        ]
     },
     'depends': [
         'payment'

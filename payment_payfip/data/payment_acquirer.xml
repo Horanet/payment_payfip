@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="payment_acquirer_tipiregie" model="payment.acquirer">
+        <record id="payment_acquirer_payfip" model="payment.acquirer">
             <field name="journal_id" eval="False"/>
             <field name="name">PayFIP</field>
-            <field name="image" type="base64" file="payment_tipiregie/static/src/img/payfip_icon.png"/>
-            <field name="provider">tipiregie</field>
+            <field name="image" type="base64" file="payment_payfip/static/src/img/payfip_icon.png"/>
+            <field name="provider">payfip</field>
             <field name="company_id" ref="base.main_company"/>
-            <field name="view_template_id" ref="tipiregie_form"/>
+            <field name="view_template_id" ref="payfip_form"/>
             <field name="environment">test</field>
             <field name="pre_msg">
                 <![CDATA[<p>You will be redirected to the PayFIP website after clicking on the payment button.</p>]]>
             </field>
-            <field name="tipiregie_customer_number">dummy</field>
-            <field name="tipiregie_form_action_url">https://www.tipi.budget.gouv.fr/tpa/paiementws.web</field>
+            <field name="payfip_customer_number">dummy</field>
+            <field name="payfip_form_action_url">https://www.tipi.budget.gouv.fr/tpa/paiementws.web</field>
             <field name="description" type="html">
                 <p>PayFIP est un système de paiement en ligne français proposé pa la Direction générale des Finances
                     Publiques. Son but est de faciliter le paiement des services publics locaux.

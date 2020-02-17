@@ -107,8 +107,8 @@ msgstr "URL de renvoi du formulaire"
 #. module: payment_tipiregie
 #: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:247
 #, python-format
-msgid "It would appear that the customer number entered is not valid or that the Tipi Régie contract is not properly configured."
-msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat Tipi Régie n'est pas correctement configuré."
+msgid "It would appear that the customer number entered is not valid or that the PayFIP contract is not properly configured."
+msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat PayFIP n'est pas correctement configuré."
 
 #. module: payment_tipiregie
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_operation_identifier
@@ -125,6 +125,12 @@ msgstr "PayFIP"
 #: model:mail.template,subject:payment_tipiregie.mail_template_draft_payments_recovered
 msgid "PayFIP: Draft payments recovered"
 msgstr "PayFIP : Paiements en brouillons réévalués"
+
+#. module: payment_tipiregie
+#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:63
+#, python-format
+msgid "PayFIP: activation mode can be activate in test environment only and if the payment acquirer is published on the website."
+msgstr "PayFIP : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
 
 #. module: payment_tipiregie
 #: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:70
@@ -157,12 +163,6 @@ msgstr "URL de retour"
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_sent_to_webservice
 msgid "Sent to PayFIP webservice"
 msgstr "Envoyée au service web de PayFIP"
-
-#. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:63
-#, python-format
-msgid "PayFIP: activation mode can be activate in test environment only and if the payment acquirer is published on the website."
-msgstr "PayFIP : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
 
 #. module: payment_tipiregie
 #: model:payment.acquirer,pre_msg:payment_tipiregie.payment_acquirer_tipiregie

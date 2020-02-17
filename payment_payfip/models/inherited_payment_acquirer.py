@@ -20,11 +20,11 @@ class PayFIPAcquirer(models.Model):
     # endregion
 
     # region Fields declaration
-    provider = fields.Selection(selection_add=[('tipiregie', "PayFIP")])
+    provider = fields.Selection(selection_add=[('payfip', 'PayFIP')])
 
-    tipiregie_customer_number = fields.Char(string="Customer number", required_if_provider='tipiregie')
-    tipiregie_form_action_url = fields.Char(string="Form action URL", required_if_provider='tipiregie')
-    tipiregie_activation_mode = fields.Boolean(string="Activation mode", default=False)
+    payfip_customer_number = fields.Char(string="Customer number", required_if_provider='payfip')
+    payfip_form_action_url = fields.Char(string="Form action URL", required_if_provider='payfip')
+    payfip_activation_mode = fields.Boolean(string="Activation mode", default=False)
 
     # endregion
 
@@ -32,33 +32,33 @@ class PayFIPAcquirer(models.Model):
     # endregion
 
     # region Constrains and Onchange
-    @api.constrains('tipiregie_customer_number')
-    def _check_tipiregie_customer_number(self):
+    @api.constrains('payfip_customer_number')
+    def _check_payfip_customer_number(self):
         self.ensure_one()
-        if self.provider == 'tipiregie' and self.tipiregie_customer_number not in ['dummy', '']:
-            webservice_enabled, message = self._tipiregie_check_web_service()
+        if self.provider == 'payfip' and self.payfip_customer_number not in ['dummy', '']:
+            webservice_enabled, message = self._payfip_check_web_service()
             if not webservice_enabled:
                 raise ValidationError(message)
 
     @api.constrains('environment')
     def _check_environment(self):
         self.ensure_one()
-        if self.provider == 'tipiregie' and self.environment != 'test':
-            self.tipiregie_activation_mode = False
+        if self.provider == 'payfip' and self.environment != 'test':
+            self.payfip_activation_mode = False
 
     @api.constrains('website_published')
     def _check_website_published(self):
         self.ensure_one()
-        if self.provider == 'tipiregie' and self.website_published:
-            webservice_enabled, message = self._tipiregie_check_web_service()
+        if self.provider == 'payfip' and self.website_published:
+            webservice_enabled, message = self._payfip_check_web_service()
             if not webservice_enabled:
                 raise ValidationError(message)
-            self.tipiregie_activation_mode = False
+            self.payfip_activation_mode = False
 
-    @api.constrains('tipiregie_activation_mode')
-    def _check_tipiregie_activation_mode(self):
+    @api.constrains('payfip_activation_mode')
+    def _check_payfip_activation_mode(self):
         self.ensure_one()
-        if self.provider == 'tipiregie' and self.tipiregie_activation_mode and (
+        if self.provider == 'payfip' and self.payfip_activation_mode and (
                 not self.website_published or self.environment not in ['test']):
             raise ValidationError(_("PayFIP: activation mode can be activate in test environment only and if "
                                     "the payment acquirer is published on the website."))
@@ -96,16 +96,16 @@ class PayFIPAcquirer(models.Model):
                         object
         """
         res = super(PayFIPAcquirer, self)._get_feature_support()
-        res['authorize'].append('tipiregie')
+        res['authorize'].append('payfip')
         return res
 
     @api.multi
-    def tipiregie_get_form_action_url(self):
+    def payfip_get_form_action_url(self):
         self.ensure_one()
-        return '/payment/tipiregie/pay'
+        return '/payment/payfip/pay'
 
     @api.multi
-    def tipiregie_get_id_op_from_web_service(self, email, price, object, acquirer_reference):
+    def payfip_get_id_op_from_web_service(self, email, price, object, acquirer_reference):
         self.ensure_one()
         id_op = ''
 
@@ -115,10 +115,10 @@ class PayFIPAcquirer(models.Model):
 
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         exer = fields.Datetime.now()[:4]
-        numcli = self.tipiregie_customer_number
-        saisie = 'X' if self.tipiregie_activation_mode else ('T' if mode == 'TEST' else 'W')
-        urlnotif = '%s' % urllib.parse.urljoin(base_url, '/payment/tipiregie/ipn')
-        urlredirect = '%s' % urllib.parse.urljoin(base_url, '/payment/tipiregie/dpn')
+        numcli = self.payfip_customer_number
+        saisie = 'X' if self.payfip_activation_mode else ('T' if mode == 'TEST' else 'W')
+        urlnotif = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/ipn')
+        urlredirect = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/dpn')
 
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
                     'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
@@ -153,7 +153,7 @@ class PayFIPAcquirer(models.Model):
 
         for error in errors:
             _logger.error(
-                "An error occured during idOp negociation with Tipi Regie web service. Informations are: {"
+                "An error occured during idOp negociation with PayFIP web service. Informations are: {"
                 "code: %s, description: %s, label: %s, severity: %s}" % (
                     error.get('code'),
                     error.get('description'),
@@ -168,7 +168,7 @@ class PayFIPAcquirer(models.Model):
         return id_op
 
     @api.model
-    def tipiregie_get_result_from_web_service(self, idOp):
+    def payfip_get_result_from_web_service(self, idOp):
         data = {}
         soap_url = self._get_soap_url()
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
@@ -195,7 +195,7 @@ class PayFIPAcquirer(models.Model):
         errors = self._get_errors_from_webservice(root)
         for error in errors:
             _logger.error(
-                "An error occured during idOp negociation with Tipi Regie web service. Informations are: {"
+                "An error occured during idOp negociation with PayFIP web service. Informations are: {"
                 "code: %s, description: %s, label: %s, severity: %s}" % (
                     error.get('code'),
                     error.get('description'),
@@ -241,10 +241,10 @@ class PayFIPAcquirer(models.Model):
         return data
 
     @api.multi
-    def _tipiregie_check_web_service(self):
+    def _payfip_check_web_service(self):
         self.ensure_one()
 
-        error = _("It would appear that the customer number entered is not valid or that the Tipi Régie contract is "
+        error = _("It would appear that the customer number entered is not valid or that the PayFIP contract is "
                   "not properly configured.")
 
         soap_url = self._get_soap_url()
@@ -263,7 +263,7 @@ class PayFIPAcquirer(models.Model):
             'xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"',
             'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/'
             'contrat_paiement_securise/PaiementSecuriseService"',
-            self.tipiregie_customer_number
+            self.payfip_customer_number
         )
 
         try:
@@ -283,10 +283,10 @@ class PayFIPAcquirer(models.Model):
         return True, ''
 
     @api.multi
-    def toggle_tipiregie_activation_mode_value(self):
-        in_activation = self.filtered(lambda acquirer: acquirer.tipiregie_activation_mode)
-        in_activation.write({'tipiregie_activation_mode': False})
-        (self - in_activation).write({'tipiregie_activation_mode': True})
+    def toggle_payfip_activation_mode_value(self):
+        in_activation = self.filtered(lambda acquirer: acquirer.payfip_activation_mode)
+        in_activation.write({'payfip_activation_mode': False})
+        (self - in_activation).write({'payfip_activation_mode': True})
 
     @api.model
     def _get_errors_from_webservice(self, root):

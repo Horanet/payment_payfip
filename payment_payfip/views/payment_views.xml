@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="acquirer_form_tipiregie" model="ir.ui.view">
-        <field name="name">Formulaire de paiement PayFIP</field>
+    <record id="acquirer_form_payfip" model="ir.ui.view">
+        <field name="name">acquirer.form.payfip</field>
         <field name="model">payment.acquirer</field>
         <field name="inherit_id" ref="payment.acquirer_form"/>
         <field name="arch" type="xml">
             <xpath expr='//group[@name="acquirer"]' position='after'>
-                <group attrs="{'invisible': [('provider', '!=', 'tipiregie')]}">
-                    <field name="tipiregie_customer_number" />
-                    <field name="tipiregie_form_action_url" />
-                    <field name="tipiregie_activation_mode" invisible="1" />
+                <group attrs="{'invisible': [('provider', '!=', 'payfip')]}">
+                    <field name="payfip_customer_number" />
+                    <field name="payfip_form_action_url" />
+                    <field name="payfip_activation_mode" invisible="1" />
                 </group>
             </xpath>
             <xpath expr='//button[@name="toggle_website_published"]'
                    position='before'>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'tipiregie'), ('tipiregie_activation_mode', '=', True)]}"
+                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', True)]}"
                         class="oe_stat_button"
-                        name="toggle_tipiregie_activation_mode_value" type="object" icon="fa-check-square-o">
+                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-check-square-o">
                     <div class="o_stat_info o_form_field">
                         <span class="text-success">Not in activation</span>
                     </div>
                 </button>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'tipiregie'), ('tipiregie_activation_mode', '=', False)]}"
+                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', False)]}"
                         class="oe_stat_button"
-                        name="toggle_tipiregie_activation_mode_value" type="object" icon="fa-square-o">
+                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-square-o">
                     <div class="o_stat_info o_form_field">
                         <span class="o_warning_text">In activation</span>
                     </div>
@@ -32,18 +32,18 @@
         </field>
     </record>
 
-    <record id="transaction_form_tipiregie" model="ir.ui.view">
+    <record id="transaction_form_payfip" model="ir.ui.view">
         <field name="name">Add operation identifier from PayFIP acquirer</field>
         <field name="model">payment.transaction</field>
         <field name="inherit_id" ref="payment.transaction_form"/>
         <field name="arch" type="xml">
             <xpath expr='//sheet' position='inside'>
                 <notebook>
-                    <page string="PayFIP">
+                    <page name="payfip" string="PayFIP">
                         <group>
-                            <field name="tipiregie_operation_identifier"/>
-                            <field name="tipiregie_sent_to_webservice"/>
-                            <field name="tipiregie_return_url" invisible="1"/>
+                            <field name="payfip_operation_identifier"/>
+                            <field name="payfip_sent_to_webservice"/>
+                            <field name="payfip_return_url" invisible="1"/>
                         </group>
                     </page>
                 </notebook>

@@ -20,16 +20,16 @@ class PayFIPTransaction(models.Model):
     # endregion
 
     # region Fields declaration
-    tipiregie_operation_identifier = fields.Char(
+    payfip_operation_identifier = fields.Char(
         string='Operation identifier',
         help='Reference of the request of TX as stored in the acquirer database',
     )
 
-    tipiregie_return_url = fields.Char(
+    payfip_return_url = fields.Char(
         string='Return URL',
     )
 
-    tipiregie_sent_to_webservice = fields.Boolean(
+    payfip_sent_to_webservice = fields.Boolean(
         string="Sent to PayFIP webservice",
         default=False,
     )
@@ -46,15 +46,15 @@ class PayFIPTransaction(models.Model):
     @api.model
     def create(self, vals):
         res = super(PayFIPTransaction, self).create(vals)
-        if res.acquirer_id.provider == 'tipiregie':
+        if res.acquirer_id.provider == 'payfip':
             prec = self.env['decimal.precision'].precision_get('Product Price')
             email = res.partner_email
             amount = int(float_round(res.amount * 100.0, prec))
             reference = res.reference.replace('/', '  slash  ')
             acquirer_reference = '%.15d' % int(uuid.uuid4().int % 899999999999999)
             res.acquirer_reference = acquirer_reference
-            idop = res.acquirer_id.tipiregie_get_id_op_from_web_service(email, amount, reference, acquirer_reference)
-            res.tipiregie_operation_identifier = idop
+            idop = res.acquirer_id.payfip_get_id_op_from_web_service(email, amount, reference, acquirer_reference)
+            res.payfip_operation_identifier = idop
 
         return res
 
@@ -65,14 +65,14 @@ class PayFIPTransaction(models.Model):
 
     # region Model methods
     @api.model
-    def _tipiregie_form_get_tx_from_data(self, idop):
+    def _payfip_form_get_tx_from_data(self, idop):
         if not idop:
             error_msg = _('PayFIP: received data with missing idop!')
             _logger.error(error_msg)
             raise ValidationError(error_msg)
 
         # find tx -> @TDENOTE use txn_id ?
-        txs = self.env['payment.transaction'].sudo().search([('tipiregie_operation_identifier', '=', idop)])
+        txs = self.env['payment.transaction'].sudo().search([('payfip_operation_identifier', '=', idop)])
         if not txs or len(txs) > 1:
             error_msg = 'PayFIP: received data for idop %s' % idop
             if not txs:
@@ -84,7 +84,7 @@ class PayFIPTransaction(models.Model):
         return txs[0]
 
     @api.multi
-    def _tipiregie_form_validate(self, idop):
+    def _payfip_form_validate(self, idop):
         self.ensure_one()
 
         # If transaction is already done, we don't try to validate again.
@@ -96,12 +96,12 @@ class PayFIPTransaction(models.Model):
             _logger.error(error_msg)
             raise ValidationError(error_msg)
 
-        data = self.acquirer_id.tipiregie_get_result_from_web_service(idop)
+        data = self.acquirer_id.payfip_get_result_from_web_service(idop)
 
-        self._tipiregie_evaluate_data(data)
+        self._payfip_evaluate_data(data)
 
     @api.multi
-    def _tipiregie_evaluate_data(self, data=False):
+    def _payfip_evaluate_data(self, data=False):
         if not data:
             return False
 
@@ -116,20 +116,20 @@ class PayFIPTransaction(models.Model):
             _logger.info(message)
 
             date_validate = fields.Datetime.now()
-            tipiregie_date = str(data.get('dattrans', ''))
-            tipiregie_datetime = str(data.get('heurtrans', ''))
-            if tipiregie_date and tipiregie_datetime and len(tipiregie_date) == 8 and len(tipiregie_datetime) == 4:
+            payfip_date = str(data.get('dattrans', ''))
+            payfip_datetime = str(data.get('heurtrans', ''))
+            if payfip_date and payfip_datetime and len(payfip_date) == 8 and len(payfip_datetime) == 4:
                 # Add a minute to validation datetime cause we don't get seconds from webservice and don't want to be
                 # in trouble with creation datetime
-                day = int(tipiregie_date[0:2])
-                month = int(tipiregie_date[2:4])
-                year = int(tipiregie_date[4:8])
-                hour = int(tipiregie_datetime[0:2])
-                minute = int(tipiregie_datetime[2:4])
-                tipiregie_tz = pytz.timezone('Europe/Paris')
+                day = int(payfip_date[0:2])
+                month = int(payfip_date[2:4])
+                year = int(payfip_date[4:8])
+                hour = int(payfip_datetime[0:2])
+                minute = int(payfip_datetime[2:4])
+                payfip_tz = pytz.timezone('Europe/Paris')
                 td_minute = timedelta(minutes=1)
                 date_validate = fields.Datetime.to_string(
-                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=tipiregie_tz) + td_minute
+                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=payfip_tz) + td_minute
                 )
 
             self.write({
@@ -165,7 +165,7 @@ class PayFIPTransaction(models.Model):
             return False
 
     @api.model
-    def tipiregie_cron_check_draft_payment_transactions(self, options={}):
+    def payfip_cron_check_draft_payment_transactions(self, options={}):
         """Execute cron task to get all draft payments and check actual state
 
         Execute cron task to get all draft payments before number of days passed as argument and ask for PayFIP
@@ -185,21 +185,21 @@ class PayFIPTransaction(models.Model):
         transaction_model = self.env['payment.transaction']
         acquirer_model = self.env['payment.acquirer']
 
-        tipiregie_acquirers = acquirer_model.search([
-            ('provider', '=', 'tipiregie'),
+        payfip_acquirers = acquirer_model.search([
+            ('provider', '=', 'payfip'),
         ])
         transactions = transaction_model.search([
-            ('acquirer_id', 'in', tipiregie_acquirers.ids),
+            ('acquirer_id', 'in', payfip_acquirers.ids),
             ('state', 'in', ['draft', 'pending']),
-            ('tipiregie_operation_identifier', '!=', False),
-            ('tipiregie_operation_identifier', '!=', ''),
+            ('payfip_operation_identifier', '!=', False),
+            ('payfip_operation_identifier', '!=', ''),
             ('create_date', '>=', fields.Datetime.to_string(date_from)),
         ])
 
         for tx in transactions:
-            self.env['payment.transaction'].form_feedback(tx.tipiregie_operation_identifier, 'tipiregie')
+            self.env['payment.transaction'].form_feedback(tx.payfip_operation_identifier, 'payfip')
 
         if send_summary:
-            mail_template = self.env.ref('payment_tipiregie.mail_template_draft_payments_recovered')
+            mail_template = self.env.ref('payment_payfip.mail_template_draft_payments_recovered')
             mail_template.with_context(transactions=transactions).send_mail(self.env.user.id)
     # endregion
