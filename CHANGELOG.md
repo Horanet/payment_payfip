@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+ - [Fix] Delete adding minute in validation data
 
 ## [10.0.1.3.2] - 2019-12-12
 ### Added

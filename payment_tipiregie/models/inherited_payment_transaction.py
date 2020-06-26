@@ -127,10 +127,11 @@ class TipiRegieTransaction(models.Model):
                 month = int(tipiregie_date[2:4])
                 year = int(tipiregie_date[4:8])
                 hour = int(tipiregie_datetime[0:2])
-                minute = int(tipiregie_datetime[2:4]) + 1
+                minute = int(tipiregie_datetime[2:4])
                 tipiregie_tz = pytz.timezone('Europe/Paris')
+                td_minute = timedelta(minutes=1)
                 date_validate = fields.Datetime.to_string(
-                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=tipiregie_tz)
+                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=tipiregie_tz) + td_minute
                 )
 
             self.write({
