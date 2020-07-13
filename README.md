@@ -1,4 +1,4 @@
-# Payfip payment acquirer
+# Tipiregie payment acquirer
 
 [![pipeline status](https://github.com/Horanet/payment_tipiregie/badges/11.0/pipeline.svg)](https://github.com/Horanet/payment_tipiregie/commits/11.0)
 [![coverage report](https://github.com/Horanet/payment_tipiregie/badges/11.0/coverage.svg)](https://github.com/Horanet/payment_tipiregie/commits/11.0)
@@ -11,6 +11,6 @@
 
 - Execute command :
 
-```bash
-pip install -e git+https://github.com/Horanet/payment_tipiregie.git@11.0#egg=odoo11-addon-payment-tipiregie
+```ruby
+pip install "git+https://github.com/Horanet/payment_tipiregie.git@11.0#egg=odoo11-addon-payment-tipiregie&subdirectory=setup/payment_tipiregie"
 ```
