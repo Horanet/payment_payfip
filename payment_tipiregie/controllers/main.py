@@ -55,8 +55,10 @@ class PayFIPController(http.Controller):
         if not post or not post.get('idop'):
             raise ValidationError("No idOp found for transaction on PayFIP")
 
-        idop = post.get('idop', False)
-        request.env['payment.transaction'].form_feedback(idop, 'tipiregie')
+        # idop = post.get('idop', False)
+        # request.env['payment.transaction'].form_feedback(idop, 'tipiregie')
+        _logger.critical(str(request.cookies))
+
 
         url = '/'
         tx = request.env['payment.transaction']._tipiregie_form_get_tx_from_data(idop)
