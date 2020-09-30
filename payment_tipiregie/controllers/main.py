@@ -57,7 +57,7 @@ class PayFIPController(http.Controller):
 
         # idop = post.get('idop', False)
         # request.env['payment.transaction'].form_feedback(idop, 'tipiregie')
-        _logger.critical(str(request.cookies))
+        _logger.critical(str(request.httprequest.cookies))
 
 
         url = '/'
