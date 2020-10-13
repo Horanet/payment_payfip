@@ -34,6 +34,22 @@ class PayFIPTransaction(models.Model):
         default=False,
     )
 
+    payfip_state = fields.Selection(
+        string="PayFIP state",
+        selection=[
+            ('P', "Effective payment (P)"),
+            ('V', "Effective payment (V)"),
+            ('A', "Abandoned payment (A)"),
+            ('R', "Other cases (R)"),
+            ('Z', "Other cases (Z)"),
+            ('U', "Unknown"),
+        ]
+    )
+
+    payfip_amount = fields.Float(
+        string="PayFIP amount",
+    )
+
     # endregion
 
     # region Fields method
@@ -61,9 +77,17 @@ class PayFIPTransaction(models.Model):
     # endregion
 
     # region Actions
+    def action_payfip_check_transaction(self):
+        self.ensure_one()
+        self._payfip_check_transactions()
     # endregion
 
     # region Model methods
+    def _payfip_check_transactions(self):
+        for rec in self.filtered('payfip_operation_identifier'):
+            data = rec.acquirer_id.payfip_get_result_from_web_service(rec.payfip_operation_identifier)
+            rec._payfip_evaluate_data(data)
+
     @api.model
     def _payfip_form_get_tx_from_data(self, idop):
         if not idop:
@@ -111,6 +135,8 @@ class PayFIPTransaction(models.Model):
         if not result:
             return False
 
+        payfip_amount = int(data.get('montant', 0)) / 100
+
         if result in ['P', 'V']:
             message = 'Validated PayFIP payment for tx %s: set as done' % self.reference
             _logger.info(message)
@@ -134,7 +160,9 @@ class PayFIPTransaction(models.Model):
 
             self.write({
                 'state': 'done',
+                'payfip_state': result,
                 'date_validate': date_validate,
+                'payfip_amount': payfip_amount,
             })
             return True
         elif result in ['A']:
@@ -142,6 +170,8 @@ class PayFIPTransaction(models.Model):
             _logger.info(message)
             self.write({
                 'state': 'cancel',
+                'payfip_state': result,
+                'payfip_amount': payfip_amount,
             })
             return True
         elif result in ['R', 'Z']:
@@ -149,7 +179,9 @@ class PayFIPTransaction(models.Model):
             _logger.info(message)
             self.write({
                 'state': 'error',
+                'payfip_state': result,
                 'state_message': message,
+                'payfip_amount': payfip_amount,
             })
             return True
         else:
@@ -160,6 +192,7 @@ class PayFIPTransaction(models.Model):
             _logger.error(message)
             self.write({
                 'state': 'error',
+                'payfip_state': 'U',
                 'state_message': message,
             })
             return False

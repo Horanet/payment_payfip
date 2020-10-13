@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 15:12+0000\n"
-"PO-Revision-Date: 2020-02-17 15:12+0000\n"
+"POT-Creation-Date: 2020-10-13 09:48+0000\n"
+"PO-Revision-Date: 2020-10-13 09:48+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -83,9 +83,24 @@ msgid "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de 
 msgstr "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
 
 #. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Abandoned payment (A)"
+msgstr "Paiement abandonné (A)"
+
+#. module: payment_tipiregie
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_acquirer_tipiregie_activation_mode
 msgid "Activation mode"
 msgstr "Mode activation"
+
+#. module: payment_tipiregie
+#: model:ir.ui.view,arch_db:payment_tipiregie.transaction_form_tipiregie
+msgid "Check PayFIP transaction"
+msgstr "Vérifier la transaction PayFIP"
+
+#. module: payment_tipiregie
+#: model:ir.actions.server,name:payment_tipiregie.tipiregie_check_transaction_action_server
+msgid "Check PayFIP transactions"
+msgstr "Vérifier les transactions PayFIP"
 
 #. module: payment_tipiregie
 #: model:ir.actions.server,name:payment_tipiregie.cron_check_draft_payment_transactions_ir_actions_server
@@ -98,6 +113,16 @@ msgstr "Cron pour vérifier les transactions de paiement PayFIP en brouillon"
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_acquirer_tipiregie_customer_number
 msgid "Customer number"
 msgstr "Numéro client"
+
+#. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Effective payment (P)"
+msgstr "Paiement effectif (P)"
+
+#. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Effective payment (V)"
+msgstr "Paiement effectif (V)"
 
 #. module: payment_tipiregie
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_acquirer_tipiregie_form_action_url
@@ -114,6 +139,16 @@ msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat P
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_operation_identifier
 msgid "Operation identifier"
 msgstr "Identifiant d'opération"
+
+#. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Other cases (R)"
+msgstr "Autres cas (R)"
+
+#. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Other cases (Z)"
+msgstr "Autres cas (Z)"
 
 #. module: payment_tipiregie
 #: model:ir.ui.view,arch_db:payment_tipiregie.transaction_form_tipiregie
@@ -133,11 +168,27 @@ msgid "PayFIP: activation mode can be activate in test environment only and if t
 msgstr "PayFIP : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
 
 #. module: payment_tipiregie
-#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:70
-#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:95
+#: code:addons/payment_tipiregie/models/inherited_payment_acquirer.py:63
+#, python-format
+msgid "PayFIP: activation mode can be activate in test environment only and if the payment acquirer is published on the website."
+msgstr "PayFIP : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
+
+#. module: payment_tipiregie
+#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:94
+#: code:addons/payment_tipiregie/models/inherited_payment_transaction.py:119
 #, python-format
 msgid "PayFIP: received data with missing idop!"
 msgstr "PayFIP : données reçues mais idop manquant !"
+
+#. module: payment_tipiregie
+#: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_amount
+msgid "PayFIP amount"
+msgstr "Montant PayFIP"
+
+#. module: payment_tipiregie
+#: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_state
+msgid "PayFIP state"
+msgstr "État PayFIP"
 
 #. module: payment_tipiregie
 #: model:ir.model,name:payment_tipiregie.model_payment_acquirer
@@ -163,6 +214,11 @@ msgstr "URL de retour"
 #: model:ir.model.fields,field_description:payment_tipiregie.field_payment_transaction_tipiregie_sent_to_webservice
 msgid "Sent to PayFIP webservice"
 msgstr "Envoyée au service web de PayFIP"
+
+#. module: payment_tipiregie
+#: selection:payment.transaction,tipiregie_state:0
+msgid "Unknown"
+msgstr "Inconnu"
 
 #. module: payment_tipiregie
 #: model:payment.acquirer,pre_msg:payment_tipiregie.payment_acquirer_tipiregie
