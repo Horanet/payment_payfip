@@ -31,5 +31,6 @@
     'application': False,
     'auto_install': False,
     'installable': True,
-    'post_init_hook': 'create_missing_journal_for_acquirers',
+    'pre_init_hook': 'migrate_tipiregie_to_payfip',
+    'post_init_hook': 'post_init_hook',
 }

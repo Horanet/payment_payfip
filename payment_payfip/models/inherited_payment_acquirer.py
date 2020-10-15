@@ -22,9 +22,18 @@ class PayFIPAcquirer(models.Model):
     # region Fields declaration
     provider = fields.Selection(selection_add=[('payfip', 'PayFIP')])
 
-    payfip_customer_number = fields.Char(string="Customer number", required_if_provider='payfip')
-    payfip_form_action_url = fields.Char(string="Form action URL", required_if_provider='payfip')
-    payfip_activation_mode = fields.Boolean(string="Activation mode", default=False)
+    payfip_customer_number = fields.Char(
+        string="Customer number",
+        required_if_provider='payfip',
+    )
+    payfip_form_action_url = fields.Char(
+        string="Form action URL",
+        required_if_provider='payfip',
+    )
+    payfip_activation_mode = fields.Boolean(
+        string="Activation mode",
+        default=False,
+    )
 
     # endregion
 
@@ -344,6 +353,5 @@ class PayFIPAcquirer(models.Model):
             }]
 
         return errors
-
     # endregion
 
