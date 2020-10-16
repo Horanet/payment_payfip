@@ -12,25 +12,32 @@ def migrate_tipiregie_to_payfip(cr):
     if openupgrade.is_module_installed(cr, 'payment_tipiregie'):
         _logger.info("The payment_tipiregie addon is detected as installed. Rename it to payment_payfip.")
 
-        # Rename view xmlids
-        xmlids_spec = [
-            ('payment_tipiregie.acquirer_form_tipiregie', 'payment_payfip.acquirer_form_payfip'),
-            ('payment_tipiregie.transaction_form_tipiregie', 'payment_payfip.transaction_form_payfip'),
-            ('payment_tipiregie.tipiregie_form', 'payment_payfip.payfip_form'),
-            ('payment_tipiregie.payment_acquirer_tipiregie', 'payment_payfip.payment_acquirer_payfip'),
-        ]
-        openupgrade.rename_xmlids(cr, xmlids_spec)
-
         # Rename addon from payment_tipiregie to payment_payfip.
         _logger.info("Rename addon from payment_tipiregie to payment_payfip.")
         openupgrade.update_module_names(cr, [('payment_tipiregie', 'payment_payfip')], merge_modules=True)
         _logger.info("End Renaming addon from payment_tipiregie to payment_payfip.")
 
+        # Rename view xmlids
+        xmlids_spec = [
+            ('payment_payfip.acquirer_form_tipiregie', 'payment_payfip.acquirer_form_payfip'),
+            ('payment_payfip.transaction_form_tipiregie', 'payment_payfip.transaction_form_payfip'),
+            ('payment_payfip.tipiregie_form', 'payment_payfip.payfip_form'),
+            # Mise à l'écart des données chargée depuis les data.xml afin de les restaurer en post
+            ('payment_payfip.payment_acquirer_tipiregie',
+             'payment_tipiregie_tmp.payment_acquirer_payfip'),
+            ('payment_payfip.cron_check_draft_payment_transactions',
+             'payment_tipiregie_tmp.cron_check_draft_payment_transactions'),
+        ]
+        openupgrade.rename_xmlids(cr, xmlids_spec)
+
         env = api.Environment(cr, SUPERUSER_ID, {})
 
         # Rename old accounting journal for avoid unique code error
         _logger.info("Rename old journal for create new one")
-        env['account.journal'].search([('code', '=', 'PAYFI')]).write({'code': 'TIPIR'})
+
+        payfip_journal = env['account.journal'].search([('code', '=', 'PAYFI')])
+        if payfip_journal:
+            payfip_journal.write({'code': 'TIPIR'})
 
         field_spec = [
             # Rename acquirer fields
