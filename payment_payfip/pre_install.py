@@ -35,9 +35,9 @@ def migrate_tipiregie_to_payfip(cr):
         # Rename old accounting journal for avoid unique code error
         _logger.info("Rename old journal for create new one")
 
-        payfip_journal = env['account.journal'].search([('code', '=', 'PAYFI')])
-        if payfip_journal:
-            payfip_journal.write({'code': 'TIPIR'})
+        default_payfip_journal = env['account.journal'].search([('code', '=', 'PAYFI'), ('name', '=ilike', 'PayFIP')])
+        if default_payfip_journal:
+            default_payfip_journal.write({'name': '__original_PayFIP'})
 
         field_spec = [
             # Rename acquirer fields

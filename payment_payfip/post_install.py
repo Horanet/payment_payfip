@@ -25,6 +25,7 @@ def post_init_hook(cr, registry):
 
     if old_payfip_aquirer_cron or old_payfip_aquirer:
         if old_payfip_aquirer:
+            new_payfip_aquirer.journal_id.unlink()
             new_payfip_aquirer.unlink()
             old_payfip_aquirer.provider = 'payfip'
 
@@ -45,11 +46,8 @@ def post_init_hook(cr, registry):
         ])
 
     # If old tipi journal exist we change the new journal for the old one
-    tipiregie_journal = env['account.journal'].search([('code', '=', 'TIPIR')])
-    if tipiregie_journal:
-        _logger.info("Assign old journal to the new aquirer")
-        env.ref('payment_payfip.payment_acquirer_payfip').write({'journal_id': tipiregie_journal.id})
-        _logger.info("Delete new journal")
-        env['account.journal'].search([('code', '=', 'PAYFI')]).unlink()
-        _logger.info("Reset correct code for the old journal")
-        tipiregie_journal.write({'code': 'PAYFI'})
+    default_payfip_journal = env['account.journal'].search([
+        ('code', '=', 'PAYFI'),
+        ('name', '=ilike', '__original_PayFIP')])
+    if default_payfip_journal:
+        default_payfip_journal.write({'name': 'PayFIP'})
