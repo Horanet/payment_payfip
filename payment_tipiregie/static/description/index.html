@@ -5,6 +5,25 @@
     </div>
 
     <h3 class="oe_slogan" style="text-align: left; border-bottom: 1px solid #eee; opacity: 1;">Description</h3>
+    <p class="alert alert-warning" role="alert"> Edit du 28 Juin 2022 : modification de l'url d'envoi SOAP de
+        https://www.tipi.budget.gouv.fr/ vers https://www.payfip.gouv.fr/.
+        Ce correctif est déjà appliqué en V11 dans le module migré PayFiP, un ajustement à dû être fait en v10 pour
+        toujours permettre aux clients d'utiliser cet intermédiaire. Cette modification n'empêchera pas une
+        migration en 11.
+    </p>
+
+    <details style="border: 1px solid #aaa; border-radius: 4px; padding: .5em .5em 0;">
+        <summary style="font-weight: bold; margin: -.5em -.5em 0; padding: .5em;">Extrait du mail de Payfip</summary>
+        Les appels à PayFiP doivent être désormais effectués sur l'adresse www.payfip.gouv.fr et non plus sur
+        "www.tipi.budget.gouv.fr".
+        Cette modification s'accompagnait d'une période transitoire de coexistence des 2 noms de domaines pour une durée
+        d'un an.
+        Le délai de reroutage à partir de l'ancien nom de domaine (www.tipi-budget.gouv.fr) arrivera donc à son terme le
+        30 juin 2022.
+        A compter de cette date, les appels à PayFiP réalisés sur l'ancien nom de domaine ne pourront plus être pris en
+        compte.
+    </details>
+    <br />
     <p>Tipi Régie est un système de paiement en ligne proposé pa la Direction générale des Finances Publiques. Son but
         est de faciliter le paiement des services publics locaux.</p>
     <p>Ce module de paiement permet de payer les commandes et factures, générées par Odoo, via le système de paiement

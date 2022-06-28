@@ -76,7 +76,7 @@ class TipiRegieAcquirer(models.Model):
     # region Model methods
     @api.model
     def _get_soap_url(self):
-        return "https://www.tipi.budget.gouv.fr/tpa/services/securite"
+        return "https://www.payfip.gouv.fr/tpa/services/securite"
 
     @api.model
     def _get_soap_namespaces(self):

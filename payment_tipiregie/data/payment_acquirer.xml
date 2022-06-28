@@ -12,7 +12,7 @@
                 <![CDATA[<p>You will be redirected to the Tipi website after clicking on the payment button.</p>]]>
             </field>
             <field name="tipiregie_customer_number">dummy</field>
-            <field name="tipiregie_form_action_url">https://www.tipi.budget.gouv.fr/tpa/paiementws.web</field>
+            <field name="tipiregie_form_action_url">https://www.payfip.gouv.fr/tpa/paiementws.web</field>
             <field name="description" type="html">
                 <p>Tipi Régie est un système de paiement en ligne français proposé pa la Direction générale des Finances
                     Publiques. Son but est de faciliter le paiement des services publics locaux.

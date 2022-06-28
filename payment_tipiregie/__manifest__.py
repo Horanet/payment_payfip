@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Intermédiaire de paiement Tipi Régie",
-    'version': '10.0.1.3.2',
+    'version': '10.0.22.06.28',
     'summary': """Intermédiaire de paiement : Implémentation de Tipi Régie""",
     'description': "no warning",
     'author': "Horanet",
