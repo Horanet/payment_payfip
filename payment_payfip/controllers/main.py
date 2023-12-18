@@ -2,7 +2,7 @@ import logging
 import pprint
 import werkzeug
 
-from odoo import http
+from odoo import _, http
 from odoo.http import request
 
 from odoo.addons.payment.models.payment_acquirer import ValidationError
@@ -15,7 +15,7 @@ class PayFIPController(http.Controller):
     def payfip_pay(self, **post):
         reference = post.pop('reference', False)
         amount = float(post.pop('amount', 0))
-        return_url = post.pop('return_url', '/')
+        return_url = post.pop('return_url', '/shop/payment/validate')
         tx = request.env['payment.transaction'].sudo().search([('reference', '=', reference), ('amount', '=', amount)])
         if tx and tx.acquirer_id.provider == 'payfip':
             # PayFIP doesn't accept two attempts with the same operation identifier, we check if transaction has
@@ -44,9 +44,10 @@ class PayFIPController(http.Controller):
             raise ValidationError("No idOp found for transaction on PayFIP")
 
         idop = post.get('idop', False)
-        request.env['payment.transaction'].form_feedback(idop, 'payfip')
+        result = request.env['payment.transaction'].form_feedback(idop, 'payfip')
 
-        return ''
+        return _('Accepted payment, order has been updated.') if result \
+            else _('Payment failure, order has been cancelled.')
 
     @http.route('/payment/payfip/dpn', type='http', auth="none", methods=['POST', 'GET'], csrf=False)
     def payfip_dpn(self, **post):
@@ -58,8 +59,6 @@ class PayFIPController(http.Controller):
         idop = post.get('idop', False)
         request.env['payment.transaction'].form_feedback(idop, 'payfip')
 
-        url = '/'
         tx = request.env['payment.transaction']._payfip_form_get_tx_from_data(idop)
-        if tx and tx.payfip_return_url:
-            url = tx.payfip_return_url
+        url = tx.payfip_return_url if tx and tx.payfip_return_url else '/shop/cart'
         return werkzeug.utils.redirect(url)

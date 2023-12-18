@@ -42,7 +42,7 @@
                 <button name="action_payfip_check_transaction" type="object"
                     class="oe_read_only"
                     string="Check PayFIP transaction"
-                    attrs="{'invisible': ['|', ('state','not in',['draft','pending']), ('provider', '!=', 'payfip')]}"
+                    attrs="{'invisible': ['|', ('state','not in', ['draft','pending']), ('provider', '!=', 'payfip')]}"
                     />
             </xpath>
             <xpath expr='//sheet' position='inside'>
@@ -69,7 +69,6 @@
         <field name="model">payment.transaction</field>
         <field name="inherit_id" ref="payment.transaction_list"/>
         <field name="arch" type="xml">
-            <!-- Add button to test transaction on acquirer site -->
             <xpath expr="//tree" position="attributes">
                 <attribute name="decoration-muted">provider == 'payfip' and payfip_state == False</attribute>
                 <attribute name="decoration-danger">provider == 'payfip' and payfip_state != False and payfip_amount != amount</attribute>

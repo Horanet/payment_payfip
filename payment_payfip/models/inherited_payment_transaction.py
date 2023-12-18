@@ -99,10 +99,7 @@ class PayFIPTransaction(models.Model):
         txs = self.env['payment.transaction'].sudo().search([('payfip_operation_identifier', '=', idop)])
         if not txs or len(txs) > 1:
             error_msg = 'PayFIP: received data for idop %s' % idop
-            if not txs:
-                error_msg += '; no order found'
-            else:
-                error_msg += '; multiple order found'
+            error_msg += '; no order found' if not txs else '; multiple order found'
             _logger.error(error_msg)
             raise ValidationError(error_msg)
         return txs[0]
@@ -147,10 +144,10 @@ class PayFIPTransaction(models.Model):
             if payfip_date and payfip_datetime and len(payfip_date) == 8 and len(payfip_datetime) == 4:
                 # Add a minute to validation datetime cause we don't get seconds from webservice and don't want to be
                 # in trouble with creation datetime
-                day = int(payfip_date[0:2])
+                day = int(payfip_date[:2])
                 month = int(payfip_date[2:4])
                 year = int(payfip_date[4:8])
-                hour = int(payfip_datetime[0:2])
+                hour = int(payfip_datetime[:2])
                 minute = int(payfip_datetime[2:4])
                 payfip_tz = pytz.timezone('Europe/Paris')
                 td_minute = timedelta(minutes=1)
@@ -198,7 +195,7 @@ class PayFIPTransaction(models.Model):
             return False
 
     @api.model
-    def payfip_cron_check_draft_payment_transactions(self, options={}):
+    def payfip_cron_check_draft_payment_transactions(self, options=None):
         """Execute cron task to get all draft payments and check actual state
 
         Execute cron task to get all draft payments before number of days passed as argument and ask for PayFIP
@@ -207,13 +204,14 @@ class PayFIPTransaction(models.Model):
         :param number_of_days: number of days (before today) to get draft transactions
         :type number_of_days: int
         """
+        if options is None:
+            options = {}
+
         number_of_days = int(options.get('number_of_days', 1))
         send_summary = bool(options.get('send_summary', False))
 
-        if number_of_days < 1:
-            number_of_days = 1
-
-        date_from = datetime.today() - timedelta(days=number_of_days)
+        number_of_days = max(number_of_days, 1)
+        date_from = datetime.now() - timedelta(days=number_of_days)
         date_from = date_from.replace(hour=0, minute=0, second=0, microsecond=0)
         transaction_model = self.env['payment.transaction']
         acquirer_model = self.env['payment.acquirer']
@@ -224,8 +222,7 @@ class PayFIPTransaction(models.Model):
         transactions = transaction_model.search([
             ('acquirer_id', 'in', payfip_acquirers.ids),
             ('state', 'in', ['draft', 'pending']),
-            ('payfip_operation_identifier', '!=', False),
-            ('payfip_operation_identifier', '!=', ''),
+            ('payfip_operation_identifier', 'not in', [False, '']),
             ('create_date', '>=', fields.Datetime.to_string(date_from)),
         ])
 

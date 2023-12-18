@@ -173,11 +173,10 @@ class PayFIPAcquirer(models.Model):
             return id_op
 
         idop_element = root.find('.//idOp')
-        id_op = idop_element.text if idop_element is not None else ''
-        return id_op
+        return idop_element.text if idop_element is not None else ''
 
     @api.model
-    def payfip_get_result_from_web_service(self, idOp):
+    def payfip_get_result_from_web_service(self, idop):
         data = {}
         soap_url = self._get_soap_url()
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
@@ -193,7 +192,7 @@ class PayFIPAcquirer(models.Model):
                     </pai:recupererDetailPaiementSecurise>
                 </soapenv:Body>
             </soapenv:Envelope>
-            """ % idOp
+            """ % idop
 
         try:
             soap_response = requests.post(soap_url, data=soap_body, headers={'content-type': 'text/xml'})
@@ -216,16 +215,16 @@ class PayFIPAcquirer(models.Model):
 
         response = root.find('.//return')
         if response is None:
-            raise Exception("No result found for transaction with idOp: %s" % idOp)
+            raise Exception("No result found for transaction with idOp: %s" % idop)
 
         resultrans = response.find('resultrans')
         if resultrans is None:
-            raise Exception("No result found for transaction with idOp: %s" % idOp)
+            raise Exception("No result found for transaction with idOp: %s" % idop)
 
         dattrans = response.find('dattrans')
         heurtrans = response.find('heurtrans')
         exer = response.find('exer')
-        idOp = response.find('idOp')
+        idop = response.find('idOp')
         mel = response.find('mel')
         montant = response.find('montant')
         numcli = response.find('numcli')
@@ -238,7 +237,7 @@ class PayFIPAcquirer(models.Model):
             'dattrans': dattrans.text if dattrans is not None else False,
             'heurtrans': heurtrans.text if heurtrans is not None else False,
             'exer': exer.text if exer is not None else False,
-            'idOp': idOp.text if idOp is not None else False,
+            'idOp': idop.text if idop is not None else False,
             'mel': mel.text if mel is not None else False,
             'montant': montant.text if montant is not None else False,
             'numcli': numcli.text if numcli is not None else False,
