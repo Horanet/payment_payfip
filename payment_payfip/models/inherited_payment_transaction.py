@@ -151,9 +151,10 @@ class PayFIPTransaction(models.Model):
                 minute = int(payfip_datetime[2:4])
                 payfip_tz = pytz.timezone('Europe/Paris')
                 td_minute = timedelta(minutes=1)
-                date_validate = fields.Datetime.to_string(
+                # localize validation datetime into utc datetime string format
+                date_validate = fields.Datetime.to_string(payfip_tz.localize(
                     datetime(year, month, day, hour=hour, minute=minute, tzinfo=payfip_tz) + td_minute
-                )
+                ).astimezone(pytz.UTC))
 
             self.write({
                 'state': 'done',
