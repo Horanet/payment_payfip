@@ -1,9 +1,9 @@
 {
     'name': "Intermédiaire de paiement PayFIP",
-    'version': '11.0.22.02.25',
+    'version': '13.0.1.0.0',
     'summary': """Intermédiaire de paiement : Implémentation de PayFIP""",
     'author': "Horanet",
-    'website': "http://www.horanet.com/",
+    'website': "https://www.horanet.com/",
     'license': "AGPL-3",
     'category': 'Accounting',
     'external_dependencies': {

@@ -43,7 +43,7 @@ class PayFIPTransaction(models.Model):
             ('R', "Other cases (R)"),
             ('Z', "Other cases (Z)"),
             ('U', "Unknown"),
-        ]
+        ],
     )
 
     payfip_amount = fields.Float(
@@ -66,7 +66,8 @@ class PayFIPTransaction(models.Model):
             prec = self.env['decimal.precision'].precision_get('Product Price')
             email = res.partner_email
             amount = int(float_round(res.amount * 100.0, prec))
-            reference = res.reference.replace('/', '  slash  ')
+            # Les caractères spéciaux ne sont pas autorisés par Payfip dans l'objet
+            reference = res.reference.replace('/', '  slash  ').replace('-', 'x')
             acquirer_reference = '%.15d' % int(uuid.uuid4().int % 899999999999999)
             res.acquirer_reference = acquirer_reference
             idop = res.acquirer_id.payfip_get_id_op_from_web_service(email, amount, reference, acquirer_reference)
@@ -96,19 +97,18 @@ class PayFIPTransaction(models.Model):
             raise ValidationError(error_msg)
 
         # find tx -> @TDENOTE use txn_id ?
-        txs = self.env['payment.transaction'].sudo().search([('payfip_operation_identifier', '=', idop)])
-        if not txs or len(txs) > 1:
-            error_msg = 'PayFIP: received data for idop %s' % idop
-            error_msg += '; no order found' if not txs else '; multiple order found'
+        transaction_ids = self.env['payment.transaction'].sudo().search([('payfip_operation_identifier', '=', idop)])
+        if not transaction_ids or len(transaction_ids) > 1:
+            error_msg = f'PayFIP: received data for idop {idop}'
+            error_msg += '; multiple order found' if transaction_ids else '; no order found'
             _logger.error(error_msg)
             raise ValidationError(error_msg)
-        return txs[0]
+        return transaction_ids[0]
 
-    @api.multi
     def _payfip_form_validate(self, idop):
         self.ensure_one()
 
-        # If transaction is already done, we don't try to validate again.
+        # If the transaction is already done, we don't try to validate again.
         if self.state in ['done']:
             return True
 
@@ -121,7 +121,6 @@ class PayFIPTransaction(models.Model):
 
         self._payfip_evaluate_data(data)
 
-    @api.multi
     def _payfip_evaluate_data(self, data=False):
         if not data:
             return False
@@ -149,16 +148,13 @@ class PayFIPTransaction(models.Model):
                 year = int(payfip_date[4:8])
                 hour = int(payfip_datetime[:2])
                 minute = int(payfip_datetime[2:4])
-                payfip_tz = pytz.timezone('Europe/Paris')
                 td_minute = timedelta(minutes=1)
-                date_validate = fields.Datetime.to_string(
-                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=payfip_tz) + td_minute
-                )
+                date_validate = datetime(year, month, day, hour=hour, minute=minute) + td_minute
 
             self.write({
                 'state': 'done',
                 'payfip_state': result,
-                'date_validate': date_validate,
+                'date': date_validate,
                 'payfip_amount': payfip_amount,
             })
             return True
@@ -223,7 +219,7 @@ class PayFIPTransaction(models.Model):
             ('acquirer_id', 'in', payfip_acquirers.ids),
             ('state', 'in', ['draft', 'pending']),
             ('payfip_operation_identifier', 'not in', [False, '']),
-            ('create_date', '>=', fields.Datetime.to_string(date_from)),  # No longer cast to string in v13
+            ('create_date', '>=', date_from),
         ])
 
         for tx in transactions:

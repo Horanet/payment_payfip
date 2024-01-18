@@ -49,29 +49,25 @@ class PayFIPAcquirer(models.Model):
             if not webservice_enabled:
                 raise ValidationError(message)
 
-    @api.constrains('environment')  # environnment -> state in v13
-    def _check_environment(self):
+    @api.constrains('state')  # website_published -> state in v13
+    def _check_state(self):
         self.ensure_one()
-        if self.provider == 'payfip' and self.environment != 'test':
-            self.payfip_activation_mode = False
-
-    @api.constrains('website_published')  # website_published -> state in v13
-    def _check_website_published(self):
-        self.ensure_one()
-        if self.provider == 'payfip' and self.website_published:
-            webservice_enabled, message = self._payfip_check_web_service()
-            if not webservice_enabled:
-                raise ValidationError(message)
-            self.payfip_activation_mode = False
+        if self.provider == 'payfip':
+            if self.state == 'enabled':
+                webservice_enabled, message = self._payfip_check_web_service()
+                if not webservice_enabled:
+                    raise ValidationError(message)
+                self.payfip_activation_mode = False
+            elif self.state == 'test':
+                self.payfip_activation_mode = True
+            else:
+                self.payfip_activation_mode = False
 
     @api.constrains('payfip_activation_mode')
     def _check_payfip_activation_mode(self):
         self.ensure_one()
-        if self.provider == 'payfip' and self.payfip_activation_mode and (
-                not self.website_published or self.environment not in ['test']):
-            raise ValidationError(_("PayFIP: activation mode can be activate in test environment only and if "
-                                    "the payment acquirer is published on the website."))
-
+        if self.provider == 'payfip' and self.payfip_activation_mode and self.state != 'test':
+            raise ValidationError(_("PayFIP: activation mode can be set in test environment only."))
     # endregion
 
     # region CRUD (overrides)
@@ -108,26 +104,26 @@ class PayFIPAcquirer(models.Model):
         res['authorize'].append('payfip')
         return res
 
-    @api.multi
     def payfip_get_form_action_url(self):
         self.ensure_one()
         return '/payment/payfip/pay'
 
-    @api.multi
     def payfip_get_id_op_from_web_service(self, email, price, object, acquirer_reference):
         self.ensure_one()
         id_op = ''
+        if self.state == 'disabled':
+            return id_op
 
         mode = 'TEST'
-        if self.environment == 'prod':
+        if self.state == 'enabled':
             mode = 'PRODUCTION'
 
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-        exer = fields.Datetime.now()[:4]
+        exer = fields.Date.today().year
         numcli = self.payfip_customer_number
         saisie = 'X' if self.payfip_activation_mode else ('T' if mode == 'TEST' else 'W')
-        urlnotif = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/ipn')
-        urlredirect = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/dpn')
+        urlnotif = f"{urllib.parse.urljoin(base_url, '/payment/payfip/ipn')}"
+        urlredirect = f"{urllib.parse.urljoin(base_url, '/payment/payfip/dpn')}"
 
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
                     'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
@@ -215,11 +211,11 @@ class PayFIPAcquirer(models.Model):
 
         response = root.find('.//return')
         if response is None:
-            raise Exception("No result found for transaction with idOp: %s" % idop)
+            raise Exception(f"No result found for transaction with idOp: {idop}")
 
         resultrans = response.find('resultrans')
         if resultrans is None:
-            raise Exception("No result found for transaction with idOp: %s" % idop)
+            raise Exception(f"No result found for transaction with idOp: {idop}")
 
         dattrans = response.find('dattrans')
         heurtrans = response.find('heurtrans')
@@ -248,7 +244,6 @@ class PayFIPAcquirer(models.Model):
 
         return data
 
-    @api.multi
     def _payfip_check_web_service(self):
         self.ensure_one()
 
@@ -290,15 +285,29 @@ class PayFIPAcquirer(models.Model):
 
         return True, ''
 
-    @api.multi
     def toggle_payfip_activation_mode_value(self):
-        in_activation = self.filtered(lambda acquirer: acquirer.payfip_activation_mode)
-        in_activation.write({'payfip_activation_mode': False})
-        (self - in_activation).write({'payfip_activation_mode': True})
+        in_activation = self.filtered('payfip_activation_mode')
+        in_activation.payfip_activation_mode = False
+        (self - in_activation).payfip_activation_mode = True
 
     @api.model
     def _get_errors_from_webservice(self, root):
         errors = []
+
+        def get_error(error_value):
+            if error_value is not None:
+                code = error_value.find('code')
+                label = error_value.find('libelle')
+                description = error_value.find('descriptif')
+                severity = error_value.find('severite')
+                return [{
+                    'code': code.text if code is not None else 'NC',
+                    'label': label.text if label is not None else 'NC',
+                    'description': description.text if description is not None else 'NC',
+                    'severity': severity.text if severity is not None else 'NC',
+                }]
+            else:
+                return []
 
         namespaces = self._get_soap_namespaces()
         error_functionnal = root.find('.//ns1:FonctionnelleErreur', namespaces)
@@ -306,50 +315,10 @@ class PayFIPAcquirer(models.Model):
         error_unavailabilityl = root.find('.//ns1:TechIndisponibiliteErreur', namespaces)
         error_protocol = root.find('.//ns1:TechProtocolaireErreur', namespaces)
 
-        if error_functionnal is not None:
-            code = error_functionnal.find('code')
-            label = error_functionnal.find('libelle')
-            description = error_functionnal.find('descriptif')
-            severity = error_functionnal.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
-        if error_dysfonctionnal is not None:
-            code = error_dysfonctionnal.find('code')
-            label = error_dysfonctionnal.find('libelle')
-            description = error_dysfonctionnal.find('descriptif')
-            severity = error_dysfonctionnal.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
-        if error_unavailabilityl is not None:
-            code = error_unavailabilityl.find('code')
-            label = error_unavailabilityl.find('libelle')
-            description = error_unavailabilityl.find('descriptif')
-            severity = error_unavailabilityl.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
-        if error_protocol is not None:
-            code = error_protocol.find('code')
-            label = error_protocol.find('libelle')
-            description = error_protocol.find('descriptif')
-            severity = error_protocol.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
+        errors += get_error(error_functionnal)
+        errors += get_error(error_dysfonctionnal)
+        errors += get_error(error_unavailabilityl)
+        errors += get_error(error_protocol)
 
         return errors
     # endregion
