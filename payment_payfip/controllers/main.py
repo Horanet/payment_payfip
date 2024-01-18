@@ -15,7 +15,7 @@ class PayFIPController(http.Controller):
     def payfip_pay(self, **post):
         reference = post.pop('reference', False)
         amount = float(post.pop('amount', 0))
-        return_url = post.pop('return_url', '/shop/payment/validate')  # /payment/process after v11
+        return_url = post.pop('return_url', '/payment/process')
         tx = request.env['payment.transaction'].sudo().search([('reference', '=', reference), ('amount', '=', amount)])
         if tx and tx.acquirer_id.provider == 'payfip':
             # PayFIP doesn't accept two attempts with the same operation identifier, we check if transaction has
