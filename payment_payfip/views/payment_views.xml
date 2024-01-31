@@ -12,23 +12,24 @@
                     <field name="payfip_activation_mode" invisible="1" />
                 </group>
             </xpath>
-            <xpath expr='//button[@name="toggle_website_published"]'
-                   position='before'>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', True)]}"
-                        class="oe_stat_button"
-                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-check-square-o">
-                    <div class="o_stat_info o_form_field">
-                        <span class="text-success">Not in activation</span>
-                    </div>
-                </button>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', False)]}"
-                        class="oe_stat_button"
-                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-square-o">
-                    <div class="o_stat_info o_form_field">
-                        <span class="o_warning_text">In activation</span>
-                    </div>
-                </button>
-            </xpath>
+            <field name="image_128" position='before'>
+                <div class="oe_button_box" name="button_box">
+                    <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', True)]}"
+                            class="oe_stat_button"
+                            name="toggle_payfip_activation_mode_value" type="object" icon="fa-check-square-o">
+                        <div class="o_stat_info o_form_field">
+                            <span class="text-success">Not in activation</span>
+                        </div>
+                    </button>
+                    <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', False)]}"
+                            class="oe_stat_button"
+                            name="toggle_payfip_activation_mode_value" type="object" icon="fa-square-o">
+                        <div class="o_stat_info o_form_field">
+                            <span class="o_warning_text">In activation</span>
+                        </div>
+                    </button>
+                </div>
+            </field>
         </field>
     </record>
 
