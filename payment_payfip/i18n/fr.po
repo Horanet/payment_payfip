@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* payment_payfip
+# 	* payment_payfip
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 11.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-04 09:13+0000\n"
-"PO-Revision-Date: 2023-12-04 09:13+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2024-01-18 10:34+0000\n"
+"PO-Revision-Date: 2024-01-18 10:34+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +17,8 @@ msgstr ""
 
 #. module: payment_payfip
 #: model:mail.template,body_html:payment_payfip.mail_template_draft_payments_recovered
-msgid "\n"
+msgid ""
+"\n"
 "<span>\n"
 "% set transactions = ctx and ctx['transactions'] or []\n"
 "</span>\n"
@@ -30,192 +31,232 @@ msgid "\n"
 "    %endfor\n"
 "</ul>\n"
 "</p>"
-msgstr "\n"
-"<span>\n"
-"% set transactions = ctx and ctx['transactions'] or []\n"
-"</span>\n"
-"<p>Des transactions de paiement de PayFIP sont restées dans l'état brouillon trop longtemps.</p>\n"
-"<p>\n"
-"Veuillez regarder la liste et les nouveaux statuts récupérés auprès de PayFIP :\n"
-"<ul>\n"
-"    % for tx in transactions:\n"
-"    <li>${tx.reference} du ${tx.create_date} avec le montant de ${tx.amount} est maintenant ${tx.state}</li>\n"
-"    %endfor\n"
-"</ul>\n"
-"</p>"
+msgstr ""
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:289
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_provider.py:0
 #, python-format
-msgid "\n"
+msgid ""
+"\n"
 "PayFIP server returned the following error: \"%s\""
-msgstr "\n"
+msgstr ""
+"\n"
 "Le serveur PayFIP retourne l'erreur suivante : \"%s\""
 
 #. module: payment_payfip
-#: model:ir.ui.view,arch_db:payment_payfip.acquirer_form_payfip
-msgid "<span class=\"o_warning_text\">In activation</span>"
-msgstr "<span class=\"o_warning_text\">En activation</span>"
-
-#. module: payment_payfip
-#: model:ir.ui.view,arch_db:payment_payfip.acquirer_form_payfip
-msgid "<span class=\"text-success\">Not in activation</span>"
-msgstr "<span class=\"text-success\">Pas en activation</span>"
-
-#. module: payment_payfip
-#: model:payment.acquirer,cancel_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Annulé,</i> votre paiement a été annulé.</span>"
-msgstr "<span><i>Annulé,</i> votre paiement a été annulé.</span>"
-
-#. module: payment_payfip
-#: model:payment.acquirer,pending_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>En attente,</i> Votre paiement en ligne a été enregistré avec succès, mais votre commande n'est pas encore validée.</span>"
-msgstr "<span><i>En attente,</i> Votre paiement en ligne a été enregistré avec succès, mais votre commande n'est pas encore validée.</span>"
-
-#. module: payment_payfip
-#: model:payment.acquirer,error_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Erreur,</i> veuillez noter qu'une erreur est survenue durant la transaction. La commande a été confirmée mais ne sera pas payée. N'hésitez pas à nous contacter si vous avez la moindre question sur le statut de votre commande.</span>"
-msgstr "<span><i>Erreur,</i> veuillez noter qu'une erreur est survenue durant la transaction. La commande a été confirmée mais ne sera pas payée. N'hésitez pas à nous contacter si vous avez la moindre question sur le statut de votre commande.</span>"
-
-#. module: payment_payfip
-#: model:payment.acquirer,done_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
-msgstr "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
-
-#. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__a
 msgid "Abandoned payment (A)"
 msgstr "Paiement abandonné (A)"
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_acquirer_payfip_activation_mode
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_acquirer_reference
+msgid "Acquirer identifier"
+msgstr "Identifiant de l'acquéreur"
+
+#. module: payment_payfip
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_provider__payfip_activation_mode
 msgid "Activation mode"
-msgstr "Mode activation"
+msgstr "Mode d'activation"
 
 #. module: payment_payfip
-#: model:ir.ui.view,arch_db:payment_payfip.transaction_form_payfip
-msgid "Check PayFIP transaction"
-msgstr "Vérifier la transaction PayFIP"
-
-#. module: payment_payfip
-#: model:ir.actions.server,name:payment_payfip.payfip_check_transaction_action_server
-msgid "Check PayFIP transactions"
-msgstr "Vérifier les transactions PayFIP"
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_provider__code
+msgid "Code"
+msgstr ""
 
 #. module: payment_payfip
 #: model:ir.actions.server,name:payment_payfip.cron_check_draft_payment_transactions_ir_actions_server
 #: model:ir.cron,cron_name:payment_payfip.cron_check_draft_payment_transactions
-#: model:ir.cron,name:payment_payfip.cron_check_draft_payment_transactions
 msgid "Cron to check PayFIP draft payment transactions"
-msgstr "Cron pour vérifier les transactions de paiement PayFIP en brouillon"
+msgstr "Cron pour vérifier les transactions de paiement PayFIP"
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_acquirer_payfip_customer_number
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_provider__payfip_customer_number
 msgid "Customer number"
-msgstr "Numéro client"
+msgstr "Numéro de client"
 
 #. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__p
 msgid "Effective payment (P)"
 msgstr "Paiement effectif (P)"
 
 #. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__v
 msgid "Effective payment (V)"
 msgstr "Paiement effectif (V)"
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_acquirer_payfip_form_action_url
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_provider__payfip_form_action_url
 msgid "Form action URL"
-msgstr "URL de renvoi du formulaire"
+msgstr "URL d'appel au web service PayFiP"
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:256
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_provider.py:0
 #, python-format
-msgid "It would appear that the customer number entered is not valid or that the PayFIP contract is not properly configured."
-msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat PayFIP n'est pas correctement configuré."
+msgid ""
+"It would appear that the customer number entered is not valid or that the "
+"PayFIP contract is not properly configured."
+msgstr ""
+"Il semblerait que le numéro client n'est pas valide ou que le contrat PayFIP"
+" n'est pas correctement configuré."
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction_payfip_operation_identifier
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_transaction.py:0
+#, python-format
+msgid "No transaction found matching idop %s."
+msgstr "Aucune transaction trouvée correspondant à l'idop %s."
+
+#. module: payment_payfip
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_operation_identifier
 msgid "Operation identifier"
-msgstr "Identifiant d'opération"
+msgstr "Identifiant d'opération (idop)"
 
 #. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__r
 msgid "Other cases (R)"
 msgstr "Autres cas (R)"
 
 #. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__z
 msgid "Other cases (Z)"
 msgstr "Autres cas (Z)"
 
 #. module: payment_payfip
-#: model:ir.ui.view,arch_db:payment_payfip.transaction_form_payfip
-#: model:payment.acquirer,name:payment_payfip.payment_acquirer_payfip
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_provider__code__payfip
 msgid "PayFIP"
-msgstr "PayFIP"
+msgstr ""
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction_payfip_amount
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_amount
 msgid "PayFIP amount"
 msgstr "Montant PayFIP"
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction_payfip_state
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_state
 msgid "PayFIP state"
 msgstr "État PayFIP"
 
 #. module: payment_payfip
+#: model:mail.template,name:payment_payfip.mail_template_draft_payments_recovered
 #: model:mail.template,subject:payment_payfip.mail_template_draft_payments_recovered
 msgid "PayFIP: Draft payments recovered"
-msgstr "PayFIP : Paiements en brouillons réévalués"
+msgstr ""
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:72
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_provider.py:0
 #, python-format
-msgid "PayFIP: activation mode can be activate in test environment only and if the payment acquirer is published on the website."
-msgstr "PayFIP : l'activation ne peut être activée qu'en environement de test et si l'intermédiaire de paiement est publié sur le site web."
+msgid ""
+"PayFIP: activation mode can be activate in test environment only and if "
+"payment provider is published on the website."
+msgstr ""
+"PayFIP : le mode d'activation ne peut être activé que dans un environnement "
+"de test et si Le fournisseur de paiement est publié sur le site Web."
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_transaction.py:94
-#: code:addons/payment_payfip/models/inherited_payment_transaction.py:119
-#, python-format
-msgid "PayFIP: received data with missing idop!"
-msgstr "PayFIP : données reçues mais idop manquant !"
+#: model:payment.provider,display_as:payment_payfip.payment_provider_payfip
+#: model:payment.provider,name:payment_payfip.payment_provider_payfip
+msgid "Payfip"
+msgstr ""
 
 #. module: payment_payfip
-#: model:ir.model,name:payment_payfip.model_payment_acquirer
-msgid "Payment Acquirer"
-msgstr "Intermédiaire de Paiement"
+#: model:ir.model,name:payment_payfip.model_payment_provider
+msgid "Payment Provider"
+msgstr "Fournisseur de paiement"
 
 #. module: payment_payfip
 #: model:ir.model,name:payment_payfip.model_payment_transaction
 msgid "Payment Transaction"
-msgstr "Transaction de paiement"
+msgstr "Transaction"
 
 #. module: payment_payfip
-#: model:ir.model.fields,help:payment_payfip.field_payment_transaction_payfip_operation_identifier
+#: model:ir.model.fields,help:payment_payfip.field_payment_transaction__payfip_operation_identifier
 msgid "Reference of the request of TX as stored in the acquirer database"
-msgstr "Référence de la demande de transaction telle que stockée dans la base de donnée de l'acquéreur."
+msgstr ""
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction_payfip_return_url
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_provider__reject_msg
+msgid "Rejected Message"
+msgstr "Message refusé"
+
+#. module: payment_payfip
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_return_url
 msgid "Return URL"
 msgstr "URL de retour"
 
 #. module: payment_payfip
-#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction_payfip_sent_to_webservice
+#: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_sent_to_webservice
 msgid "Sent to PayFIP webservice"
-msgstr "Envoyée au service web de PayFIP"
+msgstr "Envoyé au web service PayFIP"
 
 #. module: payment_payfip
-#: selection:payment.transaction,payfip_state:0
+#: model:ir.model.fields,help:payment_payfip.field_payment_provider__reject_msg
+msgid ""
+"The message displayed if the order is rejected during the payment process"
+msgstr ""
+"Le message affiché si la commande est rejetée lors du processus de paiement"
+
+#. module: payment_payfip
+#: model:ir.model.fields,help:payment_payfip.field_payment_provider__code
+msgid "The technical code of this payment provider."
+msgstr "Le code technique de ce fournisseur de paiement."
+
+#. module: payment_payfip
+#: model:ir.model.fields.selection,name:payment_payfip.selection__payment_transaction__payfip_state__u
 msgid "Unknown"
 msgstr "Inconnu"
 
 #. module: payment_payfip
-#: model:payment.acquirer,pre_msg:payment_payfip.payment_acquirer_payfip
-msgid "You will be redirected to the PayFIP website after clicking on the payment button."
-msgstr "Vous allez être redirigé vers le site internet de PayFIP après avoir cliqué sur le bouton de paiement."
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_transaction.py:0
+#, python-format
+msgid "Unknown payment status: %s"
+msgstr "Statut de paiement inconnu : %s"
 
+#. module: payment_payfip
+#: model_terms:payment.provider,pre_msg:payment_payfip.payment_provider_payfip
+msgid ""
+"You will be redirected to the PayFIP website after clicking on the payment "
+"button."
+msgstr ""
+"Vous serez redirigé vers le site PayFIP après avoir cliqué sur le "
+"bouton Payer."
+
+#. module: payment_payfip
+#: model_terms:payment.provider,auth_msg:payment_payfip.payment_provider_payfip
+msgid "Your payment has been authorized."
+msgstr "Votre paiement a été autorisé."
+
+#. module: payment_payfip
+#: model_terms:payment.provider,cancel_msg:payment_payfip.payment_provider_payfip
+msgid "Your payment has been cancelled."
+msgstr "Votre paiement a été annulé."
+
+#. module: payment_payfip
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_provider.py:0
+#: model:payment.provider,reject_msg:payment_payfip.payment_provider_payfip
+#, python-format
+msgid "Your payment has been rejected."
+msgstr "Votre paiement a été rejeté."
+
+#. module: payment_payfip
+#: model_terms:payment.provider,pending_msg:payment_payfip.payment_provider_payfip
+msgid ""
+"Your payment has been successfully processed but is waiting for approval."
+msgstr ""
+"Votre paiement a été traité avec succès mais est en attente d'approbation."
+
+#. module: payment_payfip
+#: model_terms:payment.provider,done_msg:payment_payfip.payment_provider_payfip
+msgid "Your payment has been successfully processed. Thank you!"
+msgstr "Votre paiement a été traité avec succès. Merci!"
+
+#. module: payment_payfip
+#. odoo-python
+#: code:addons/payment_payfip/models/payment_transaction.py:0
+#, python-format
+msgid "received data with missing idop!"
+msgstr "reçu des données avec l'idop manquant !"

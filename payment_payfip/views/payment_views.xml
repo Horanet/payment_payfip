@@ -1,48 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="acquirer_form_payfip" model="ir.ui.view">
-        <field name="name">acquirer.form.payfip</field>
-        <field name="model">payment.acquirer</field>
-        <field name="inherit_id" ref="payment.acquirer_form"/>
+    <record id="payment_provider_form" model="ir.ui.view">
+        <field name="name">Payfip Provider Form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
         <field name="arch" type="xml">
-            <xpath expr='//group[@name="acquirer"]' position='after'>
-                <group attrs="{'invisible': [('provider', '!=', 'payfip')]}">
+            <group name="provider_credentials" position="inside">
+                <group attrs="{'invisible': [('code', '!=', 'payfip')]}">
                     <field name="payfip_customer_number" />
                     <field name="payfip_form_action_url" />
-                    <field name="payfip_activation_mode" invisible="1" />
+                    <field name="payfip_activation_mode" />
                 </group>
-            </xpath>
-            <xpath expr='//button[@name="toggle_website_published"]'
-                   position='before'>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', True)]}"
-                        class="oe_stat_button"
-                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-check-square-o">
-                    <div class="o_stat_info o_form_field">
-                        <span class="text-success">Not in activation</span>
-                    </div>
-                </button>
-                <button attrs="{'invisible': ['|', ('provider', '!=', 'payfip'), ('payfip_activation_mode', '=', False)]}"
-                        class="oe_stat_button"
-                        name="toggle_payfip_activation_mode_value" type="object" icon="fa-square-o">
-                    <div class="o_stat_info o_form_field">
-                        <span class="o_warning_text">In activation</span>
-                    </div>
-                </button>
+            </group>
+            <xpath expr="//page[@name='messages']/group" position="inside">
+                <field name="reject_msg" attrs="{'invisible': [('code', '!=', 'payfip')]}"/>                
             </xpath>
         </field>
     </record>
 
-    <record id="transaction_form_payfip" model="ir.ui.view">
+    <!-- <record id="transaction_form_payfip" model="ir.ui.view">
         <field name="name">Add operation identifier from PayFIP acquirer</field>
         <field name="model">payment.transaction</field>
         <field name="inherit_id" ref="payment.transaction_form"/>
         <field name="arch" type="xml">
-            <!-- Add button to test transaction on acquirer site -->
             <xpath expr="//header" position="inside">
                 <button name="action_payfip_check_transaction" type="object"
                     class="oe_read_only"
                     string="Check PayFIP transaction"
-                    attrs="{'invisible': ['|', ('state','not in', ['draft','pending']), ('provider', '!=', 'payfip')]}"
+                    attrs="{'invisible': ['|', ('state','not in',['draft','pending']), ('provider', '!=', 'payfip')]}"
                     />
             </xpath>
             <xpath expr='//sheet' position='inside'>
@@ -63,8 +48,9 @@
                 </notebook>
             </xpath>
         </field>
-    </record>
-    <record id="transaction_list_payfip" model="ir.ui.view">
+    </record> -->
+
+    <!-- <record id="transaction_list_payfip" model="ir.ui.view">
         <field name="name">Add decorators for PayFIP transactions</field>
         <field name="model">payment.transaction</field>
         <field name="inherit_id" ref="payment.transaction_list"/>
@@ -79,8 +65,9 @@
                 <field name="payfip_amount" invisible="1"/>
             </xpath>
         </field>
-    </record>
-    <record id="payfip_check_transaction_action_server" model="ir.actions.server">
+    </record> -->
+    
+    <!-- <record id="payfip_check_transaction_action_server" model="ir.actions.server">
         <field name="name">Check PayFIP transactions</field>
         <field name="model_id" ref="model_payment_transaction"/>
         <field name="binding_model_id" ref="model_payment_transaction"/>
@@ -89,6 +76,6 @@
 if records:
     records._payfip_check_transactions()
         </field>
-    </record>
+    </record> -->
 
 </odoo>

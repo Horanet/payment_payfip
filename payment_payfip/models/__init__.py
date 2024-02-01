@@ -1,2 +1,2 @@
-from . import inherited_payment_acquirer
-from . import inherited_payment_transaction
+from . import payment_provider
+from . import payment_transaction

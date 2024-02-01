@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="payment_provider_payfip" model="payment.provider">
+            <field name="name">Payfip</field>
+            <field name="code">payfip</field>
+            <field name="display_as">Payfip</field>
+            <field name="module_id" ref="base.module_payment_payfip"/>
+            <field name="image_128" type="base64" file="payment_payfip/static/description/icon.jpg"/>
+            <field name="pre_msg">
+                <![CDATA[<p>You will be redirected to the PayFIP website after clicking on the payment button.</p>]]>
+            </field>
+            <field name="payfip_customer_number">dummy</field>
+            <field name="payfip_form_action_url">https://www.payfip.gouv.fr/tpa/paiementws.web</field>
+            <field name="redirect_form_view_id" ref="payfip_form"/>
+        </record>
+    </data>
+</odoo>
