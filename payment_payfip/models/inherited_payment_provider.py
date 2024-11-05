@@ -1,26 +1,23 @@
 import logging
-import requests
 import urllib.parse
-from requests.exceptions import ConnectionError
 from xml.etree import ElementTree
 
-from odoo import api, fields, models, _
+import requests
+from requests.exceptions import ConnectionError
 
-from odoo.addons.payment.models.payment_acquirer import ValidationError
+from odoo import _, api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
 
 
 class PayFIPAcquirer(models.Model):
-    # region Private attributes
-    _inherit = 'payment.acquirer'
-    # endregion
+    _inherit = 'payment.provider'
 
     # region Default methods
     # endregion
 
     # region Fields declaration
-    provider = fields.Selection(selection_add=[('payfip', 'PayFIP')])
+    code = fields.Selection(selection_add=[('payfip', 'PayFIP')], ondelete={'payfip': 'set default'})
 
     payfip_customer_number = fields.Char(
         string="Customer number",
@@ -35,42 +32,34 @@ class PayFIPAcquirer(models.Model):
         default=False,
     )
 
+    reject_msg = fields.Html(
+        string="Rejected Message",
+        help="The message displayed if the order is rejected during the payment process",
+        default=lambda self: _("Your payment has been rejected."),
+        translate=True,
+    )
     # endregion
 
-    # region Fields method
-    # endregion
-
-    # region Constrains and Onchange
+    # region constraint
     @api.constrains('payfip_customer_number')
     def _check_payfip_customer_number(self):
         self.ensure_one()
-        if self.provider == 'payfip' and self.payfip_customer_number not in ['dummy', '']:
+        if self.code == 'payfip' and self.payfip_customer_number not in ['dummy', '']:
             webservice_enabled, message = self._payfip_check_web_service()
             if not webservice_enabled:
-                raise ValidationError(message)
+                raise exceptions.ValidationError(message)
 
-    @api.constrains('environment')  # environnment -> state in v13
-    def _check_environment(self):
+    @api.constrains('state')
+    def _check_payfip_state(self):
         self.ensure_one()
-        if self.provider == 'payfip' and self.environment != 'test':
-            self.payfip_activation_mode = False
-
-    @api.constrains('website_published')  # website_published -> state in v13
-    def _check_website_published(self):
-        self.ensure_one()
-        if self.provider == 'payfip' and self.website_published:
-            webservice_enabled, message = self._payfip_check_web_service()
-            if not webservice_enabled:
-                raise ValidationError(message)
+        if self.code == 'payfip' and self.state != 'test':
             self.payfip_activation_mode = False
 
     @api.constrains('payfip_activation_mode')
     def _check_payfip_activation_mode(self):
         self.ensure_one()
-        if self.provider == 'payfip' and self.payfip_activation_mode and (
-                not self.website_published or self.environment not in ['test']):
-            raise ValidationError(_("PayFIP: activation mode can be activate in test environment only and if "
-                                    "the payment acquirer is published on the website."))
+        if self.code == 'payfip' and self.payfip_activation_mode and self.state != 'test':
+            raise exceptions.ValidationError(_("PayFIP: activation mode can be activate in test environment only."))
 
     # endregion
 
@@ -83,13 +72,13 @@ class PayFIPAcquirer(models.Model):
     # region Model methods
     @api.model
     def _get_soap_url(self):
-        return "https://www.payfip.gouv.fr/tpa/services/securite"
+        return 'https://www.payfip.gouv.fr/tpa/services/securite'
 
     @api.model
     def _get_soap_namespaces(self):
         return {
-            'ns1': "http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/"
-                   "contrat_paiement_securise/PaiementSecuriseService"
+            'ns1': 'http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/'
+            'contrat_paiement_securise/PaiementSecuriseService'
         }
 
     @api.model
@@ -108,30 +97,32 @@ class PayFIPAcquirer(models.Model):
         res['authorize'].append('payfip')
         return res
 
-    @api.multi
     def payfip_get_form_action_url(self):
         self.ensure_one()
         return '/payment/payfip/pay'
 
-    @api.multi
     def payfip_get_id_op_from_web_service(self, email, price, object, acquirer_reference):
         self.ensure_one()
         id_op = ''
 
         mode = 'TEST'
-        if self.environment == 'prod':
+        if self.state == 'enabled':
             mode = 'PRODUCTION'
 
-        base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-        exer = fields.Datetime.now()[:4]
+        if self.website_id:
+            base_url = self.website_id.get_base_url()
+        else:
+            base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+        exer = fields.Datetime.now().strftime('%Y')
         numcli = self.payfip_customer_number
         saisie = 'X' if self.payfip_activation_mode else ('T' if mode == 'TEST' else 'W')
-        urlnotif = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/ipn')
-        urlredirect = '%s' % urllib.parse.urljoin(base_url, '/payment/payfip/dpn')
+        urlnotif = "%s" % urllib.parse.urljoin(str(base_url), '/payment/payfip/ipn')
+        urlredirect = "%s" % urllib.parse.urljoin(str(base_url), '/payment/payfip/dpn')
 
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
-                    'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
-                    'contrat_paiement_securise/PaiementSecuriseService">'
+            'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
+            'contrat_paiement_securise/PaiementSecuriseService">'
+
         soap_body += """
                 <soapenv:Header/>
                 <soapenv:Body>
@@ -141,7 +132,7 @@ class PayFIPAcquirer(models.Model):
                             <mel>%s</mel>
                             <montant>%s</montant>
                             <numcli>%s</numcli>
-                            <objet>%s</objet>
+                            <object>%s</object>
                             <refdet>%s</refdet>
                             <saisie>%s</saisie>
                             <urlnotif>%s</urlnotif>
@@ -150,7 +141,17 @@ class PayFIPAcquirer(models.Model):
                     </pai:creerPaiementSecurise>
                 </soapenv:Body>
             </soapenv:Envelope>
-            """ % (exer, email, price, numcli, object, acquirer_reference, saisie, urlnotif, urlredirect)
+            """ % (
+            exer,
+            email,
+            price,
+            numcli,
+            object,
+            acquirer_reference,
+            saisie,
+            urlnotif,
+            urlredirect,
+        )
 
         try:
             response = requests.post(self._get_soap_url(), data=soap_body, headers={'content-type': 'text/xml'})
@@ -163,26 +164,31 @@ class PayFIPAcquirer(models.Model):
         for error in errors:
             _logger.error(
                 "An error occured during idOp negociation with PayFIP web service. Informations are: {"
-                "code: %s, description: %s, label: %s, severity: %s}" % (
+                "code: %s, description: %s, label: %s, severity: %s}"
+                % (
                     error.get('code'),
                     error.get('description'),
                     error.get('label'),
                     error.get('severity'),
                 )
             )
+            _logger.debug(error)
             return id_op
 
         idop_element = root.find('.//idOp')
-        return idop_element.text if idop_element is not None else ''
+        id_op = idop_element.text if idop_element is not None else ''
+        return id_op
 
     @api.model
-    def payfip_get_result_from_web_service(self, idop):
+    def payfip_get_result_from_web_service(self, idOp):
         data = {}
         soap_url = self._get_soap_url()
         soap_body = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' \
-                    'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
-                    'contrat_paiement_securise/PaiementSecuriseService">'
-        soap_body += """
+            'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/' \
+            'contrat_paiement_securise/PaiementSecuriseService">'
+
+        soap_body += (
+            """
                 <soapenv:Header/>
                 <soapenv:Body>
                     <pai:recupererDetailPaiementSecurise>
@@ -192,7 +198,9 @@ class PayFIPAcquirer(models.Model):
                     </pai:recupererDetailPaiementSecurise>
                 </soapenv:Body>
             </soapenv:Envelope>
-            """ % idop
+            """
+            % idOp
+        )
 
         try:
             soap_response = requests.post(soap_url, data=soap_body, headers={'content-type': 'text/xml'})
@@ -204,7 +212,8 @@ class PayFIPAcquirer(models.Model):
         for error in errors:
             _logger.error(
                 "An error occured during idOp negociation with PayFIP web service. Informations are: {"
-                "code: %s, description: %s, label: %s, severity: %s}" % (
+                "code: %s, description: %s, label: %s, severity: %s}"
+                % (
                     error.get('code'),
                     error.get('description'),
                     error.get('label'),
@@ -215,16 +224,16 @@ class PayFIPAcquirer(models.Model):
 
         response = root.find('.//return')
         if response is None:
-            raise Exception("No result found for transaction with idOp: %s" % idop)
+            raise Exception("No result found for transaction with idOp: %s" % idOp)
 
         resultrans = response.find('resultrans')
         if resultrans is None:
-            raise Exception("No result found for transaction with idOp: %s" % idop)
+            raise Exception("No result found for transaction with idOp: %s" % idOp)
 
         dattrans = response.find('dattrans')
         heurtrans = response.find('heurtrans')
         exer = response.find('exer')
-        idop = response.find('idOp')
+        idOp = response.find('idOp')
         mel = response.find('mel')
         montant = response.find('montant')
         numcli = response.find('numcli')
@@ -237,7 +246,7 @@ class PayFIPAcquirer(models.Model):
             'dattrans': dattrans.text if dattrans is not None else False,
             'heurtrans': heurtrans.text if heurtrans is not None else False,
             'exer': exer.text if exer is not None else False,
-            'idOp': idop.text if idop is not None else False,
+            'idOp': idOp.text if idOp is not None else False,
             'mel': mel.text if mel is not None else False,
             'montant': montant.text if montant is not None else False,
             'numcli': numcli.text if numcli is not None else False,
@@ -248,7 +257,6 @@ class PayFIPAcquirer(models.Model):
 
         return data
 
-    @api.multi
     def _payfip_check_web_service(self):
         self.ensure_one()
 
@@ -271,12 +279,13 @@ class PayFIPAcquirer(models.Model):
             'xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"',
             'xmlns:pai="http://securite.service.tpa.cp.finances.gouv.fr/services/mas_securite/'
             'contrat_paiement_securise/PaiementSecuriseService"',
-            self.payfip_customer_number
+            self.payfip_customer_number,
         )
 
         try:
             soap_response = requests.post(soap_url, data=soap_body, headers={'content-type': 'text/xml'})
         except ConnectionError:
+            _logger.error(error)
             return False, error
 
         root = ElementTree.fromstring(soap_response.content)
@@ -285,12 +294,13 @@ class PayFIPAcquirer(models.Model):
         if fault is not None:
             error_desc = fault.find('.//descriptif')
             if error_desc is not None:
-                error += _("\nPayFIP server returned the following error: \"%s\"") % error_desc.text
+                error += _('\nPayFIP server returned the following error: "%s"') % error_desc.text
+            _logger.error(error)
+            _logger.debug(fault)
             return False, error
 
         return True, ''
 
-    @api.multi
     def toggle_payfip_activation_mode_value(self):
         in_activation = self.filtered(lambda acquirer: acquirer.payfip_activation_mode)
         in_activation.write({'payfip_activation_mode': False})
@@ -311,46 +321,54 @@ class PayFIPAcquirer(models.Model):
             label = error_functionnal.find('libelle')
             description = error_functionnal.find('descriptif')
             severity = error_functionnal.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
+            errors += [
+                {
+                    'code': code.text if code is not None else 'NC',
+                    'label': label.text if label is not None else 'NC',
+                    'description': description.text if description is not None else 'NC',
+                    'severity': severity.text if severity is not None else 'NC',
+                }
+            ]
         if error_dysfonctionnal is not None:
             code = error_dysfonctionnal.find('code')
             label = error_dysfonctionnal.find('libelle')
             description = error_dysfonctionnal.find('descriptif')
             severity = error_dysfonctionnal.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
+            errors += [
+                {
+                    'code': code.text if code is not None else 'NC',
+                    'label': label.text if label is not None else 'NC',
+                    'description': description.text if description is not None else 'NC',
+                    'severity': severity.text if severity is not None else 'NC',
+                }
+            ]
         if error_unavailabilityl is not None:
             code = error_unavailabilityl.find('code')
             label = error_unavailabilityl.find('libelle')
             description = error_unavailabilityl.find('descriptif')
             severity = error_unavailabilityl.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
+            errors += [
+                {
+                    'code': code.text if code is not None else 'NC',
+                    'label': label.text if label is not None else 'NC',
+                    'description': description.text if description is not None else 'NC',
+                    'severity': severity.text if severity is not None else 'NC',
+                }
+            ]
         if error_protocol is not None:
             code = error_protocol.find('code')
             label = error_protocol.find('libelle')
             description = error_protocol.find('descriptif')
             severity = error_protocol.find('severite')
-            errors += [{
-                'code': code.text if code is not None else 'NC',
-                'label': label.text if label is not None else 'NC',
-                'description': description.text if description is not None else 'NC',
-                'severity': severity.text if severity is not None else 'NC',
-            }]
+            errors += [
+                {
+                    'code': code.text if code is not None else 'NC',
+                    'label': label.text if label is not None else 'NC',
+                    'description': description.text if description is not None else 'NC',
+                    'severity': severity.text if severity is not None else 'NC',
+                }
+            ]
 
         return errors
-    # endregion
 
+    # endregion

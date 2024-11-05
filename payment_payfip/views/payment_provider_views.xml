@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_provider_form" model="ir.ui.view">
+        <field name="name">Payfip Provider Form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group attrs="{'invisible': [('code', '!=', 'payfip')]}">
+                    <field name="payfip_customer_number" />
+                    <field name="payfip_form_action_url" />
+                    <field name="payfip_activation_mode" />
+                </group>
+            </group>
+            <xpath expr="//page[@name='messages']/group" position="inside">
+                <field name="reject_msg" attrs="{'invisible': [('code', '!=', 'payfip')]}"/>                
+            </xpath>
+        </field>
+    </record>
+</odoo>

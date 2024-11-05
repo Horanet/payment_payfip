@@ -2,12 +2,12 @@
 <odoo>
     <data noupdate="1">
         <!-- Cron to check PayFIP draft payment transactions -->
-        <record id="cron_check_draft_payment_transactions" model="ir.cron" forcecreate="0">
+        <record id="ir_cron_check_draft_payment_transactions" model="ir.cron" forcecreate="0">
             <field name="name">Cron to check PayFIP draft payment transactions</field>
             <field name="model_id" ref="payment.model_payment_transaction"/>
             <field name="state">code</field>
             <field name="code">model.payfip_cron_check_draft_payment_transactions({'number_of_days':1,'send_summary':False})</field>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
             <field name="user_id" ref="base.user_root"/>
             <field name="interval_number">5</field>
             <field name="interval_type">minutes</field>

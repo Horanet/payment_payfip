@@ -8,7 +8,6 @@
             <field name="subject">PayFIP: Draft payments recovered</field>
             <field name="lang">${user.partner_id.lang}</field>
             <field name="auto_delete" eval="True"/>
-            <field name="user_signature" eval="True"/>
             <field name="body_html"><![CDATA[
 <span>
 % set transactions = ctx and ctx['transactions'] or []
