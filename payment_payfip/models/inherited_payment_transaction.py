@@ -43,7 +43,7 @@ class PayFIPTransaction(models.Model):
             ('R', "Other cases (R)"),
             ('Z', "Other cases (Z)"),
             ('U', "Unknown"),
-        ]
+        ],
     )
 
     payfip_amount = fields.Float(
@@ -80,6 +80,7 @@ class PayFIPTransaction(models.Model):
     def action_payfip_check_transaction(self):
         self.ensure_one()
         self._payfip_check_transactions()
+
     # endregion
 
     # region Model methods
@@ -152,47 +153,54 @@ class PayFIPTransaction(models.Model):
                 payfip_tz = pytz.timezone('Europe/Paris')
                 td_minute = timedelta(minutes=1)
                 # localize validation datetime into utc datetime string format
-                date_validate = fields.Datetime.to_string(payfip_tz.localize(
-                    datetime(year, month, day, hour=hour, minute=minute, tzinfo=payfip_tz) + td_minute
-                ).astimezone(pytz.UTC))
+                date_validate = fields.Datetime.to_string(
+                    payfip_tz.localize(datetime(year, month, day, hour=hour, minute=minute) + td_minute).astimezone(
+                        pytz.UTC
+                    )
+                )
 
-            self.write({
-                'state': 'done',
-                'payfip_state': result,
-                'date_validate': date_validate,
-                'payfip_amount': payfip_amount,
-            })
+            self.write(
+                {
+                    'state': 'done',
+                    'payfip_state': result,
+                    'date_validate': date_validate,
+                    'payfip_amount': payfip_amount,
+                }
+            )
             return True
         elif result in ['A']:
             message = 'Received notification for PayFIP payment %s: set as canceled' % self.reference
             _logger.info(message)
-            self.write({
-                'state': 'cancel',
-                'payfip_state': result,
-                'payfip_amount': payfip_amount,
-            })
+            self.write(
+                {
+                    'state': 'cancel',
+                    'payfip_state': result,
+                    'payfip_amount': payfip_amount,
+                }
+            )
             return True
         elif result in ['R', 'Z']:
             message = 'Received notification for PayFIP payment %s: set as error' % self.reference
             _logger.info(message)
-            self.write({
-                'state': 'error',
-                'payfip_state': result,
-                'state_message': message,
-                'payfip_amount': payfip_amount,
-            })
+            self.write(
+                {
+                    'state': 'error',
+                    'payfip_state': result,
+                    'state_message': message,
+                    'payfip_amount': payfip_amount,
+                }
+            )
             return True
         else:
-            message = 'Received unrecognized status for PayFIP payment %s: %s, set as error' % (
-                self.reference,
-                result
-            )
+            message = 'Received unrecognized status for PayFIP payment %s: %s, set as error' % (self.reference, result)
             _logger.error(message)
-            self.write({
-                'state': 'error',
-                'payfip_state': 'U',
-                'state_message': message,
-            })
+            self.write(
+                {
+                    'state': 'error',
+                    'payfip_state': 'U',
+                    'state_message': message,
+                }
+            )
             return False
 
     @api.model
@@ -217,15 +225,19 @@ class PayFIPTransaction(models.Model):
         transaction_model = self.env['payment.transaction']
         acquirer_model = self.env['payment.acquirer']
 
-        payfip_acquirers = acquirer_model.search([
-            ('provider', '=', 'payfip'),
-        ])
-        transactions = transaction_model.search([
-            ('acquirer_id', 'in', payfip_acquirers.ids),
-            ('state', 'in', ['draft', 'pending']),
-            ('payfip_operation_identifier', 'not in', [False, '']),
-            ('create_date', '>=', fields.Datetime.to_string(date_from)),
-        ])
+        payfip_acquirers = acquirer_model.search(
+            [
+                ('provider', '=', 'payfip'),
+            ]
+        )
+        transactions = transaction_model.search(
+            [
+                ('acquirer_id', 'in', payfip_acquirers.ids),
+                ('state', 'in', ['draft', 'pending']),
+                ('payfip_operation_identifier', 'not in', [False, '']),
+                ('create_date', '>=', fields.Datetime.to_string(date_from)),
+            ]
+        )
 
         for tx in transactions:
             self.env['payment.transaction'].form_feedback(tx.payfip_operation_identifier, 'payfip')
@@ -233,4 +245,5 @@ class PayFIPTransaction(models.Model):
         if send_summary:
             mail_template = self.env.ref('payment_payfip.mail_template_draft_payments_recovered')
             mail_template.with_context(transactions=transactions).send_mail(self.env.user.id)
+
     # endregion
