@@ -5,7 +5,7 @@
             <!-- idOp -->
             <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
             <input type="hidden" name="reference" t-att-value="reference"/>
-            <input type="hidden" name="amount" t-att-value="amount"/>
+            <input type="hidden" name="amount" t-att-value="'%.2f' % amount"/>
             <input type="hidden" name="return_url" t-att-value="return_url"/>
         </div>
     </template>
