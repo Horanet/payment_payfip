@@ -60,19 +60,32 @@ class PayFIPTransaction(models.Model):
 
     # region CRUD (overrides)
     @api.model
-    def create(self, vals):
-        res = super(PayFIPTransaction, self).create(vals)
-        if res.acquirer_id.provider == 'payfip':
-            prec = self.env['decimal.precision'].precision_get('Product Price')
-            email = res.partner_email
-            amount = int(float_round(res.amount * 100.0, prec))
-            reference = res.reference.replace('/', '  slash  ')
+    def payfip_create(self, vals):
+        idop = ''
+        acquirer_reference = ''
+        acquirer = self.env['payment.acquirer'].browse(vals['acquirer_id'])
+        prec = self.env['decimal.precision'].precision_get('Product Price')
+        partner_email = vals.get('partner_email', False)
+        amount_val = vals.get('amount', 0)
+        reference_val = vals.get('reference', '')
+        if partner_email and reference_val and amount_val > 0:
+            amount = int(float_round(amount_val * 100.0, prec))
+            reference = reference_val.replace('/', '  slash  ')
             acquirer_reference = '%.15d' % int(uuid.uuid4().int % 899999999999999)
-            res.acquirer_reference = acquirer_reference
-            idop = res.acquirer_id.payfip_get_id_op_from_web_service(email, amount, reference, acquirer_reference)
-            res.payfip_operation_identifier = idop
+            idop = acquirer.payfip_get_id_op_from_web_service(partner_email, amount,
+                                                              reference, acquirer_reference)
+        else:
+            _logger.error(
+                'An error occurred before idOp negociation with PayFIP web service. Missing data in transaction.'
+            )
 
-        return res
+        if idop:
+            return {
+                'acquirer_reference': acquirer_reference,
+                'payfip_operation_identifier': idop,
+            }
+        else:
+            raise ValueError(_('An error occurred, please retry later.'))
 
     # endregion
 

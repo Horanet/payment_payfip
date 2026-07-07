@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-04 09:13+0000\n"
-"PO-Revision-Date: 2023-12-04 09:13+0000\n"
+"POT-Creation-Date: 2026-07-08 09:47+0000\n"
+"PO-Revision-Date: 2026-07-08 09:47+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -45,7 +45,7 @@ msgstr "\n"
 "</p>"
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:289
+#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:288
 #, python-format
 msgid "\n"
 "PayFIP server returned the following error: \"%s\""
@@ -64,23 +64,23 @@ msgstr "<span class=\"text-success\">Pas en activation</span>"
 
 #. module: payment_payfip
 #: model:payment.acquirer,cancel_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Annulé,</i> votre paiement a été annulé.</span>"
+msgid "<span><i>Cancel,</i> Your payment has been cancelled.</span>"
 msgstr "<span><i>Annulé,</i> votre paiement a été annulé.</span>"
 
 #. module: payment_payfip
-#: model:payment.acquirer,pending_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>En attente,</i> Votre paiement en ligne a été enregistré avec succès, mais votre commande n'est pas encore validée.</span>"
-msgstr "<span><i>En attente,</i> Votre paiement en ligne a été enregistré avec succès, mais votre commande n'est pas encore validée.</span>"
+#: model:payment.acquirer,done_msg:payment_payfip.payment_acquirer_payfip
+msgid "<span><i>Done,</i> Your online payment has been successfully processed. Thank you for your order.</span>"
+msgstr "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
 
 #. module: payment_payfip
 #: model:payment.acquirer,error_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Erreur,</i> veuillez noter qu'une erreur est survenue durant la transaction. La commande a été confirmée mais ne sera pas payée. N'hésitez pas à nous contacter si vous avez la moindre question sur le statut de votre commande.</span>"
-msgstr "<span><i>Erreur,</i> veuillez noter qu'une erreur est survenue durant la transaction. La commande a été confirmée mais ne sera pas payée. N'hésitez pas à nous contacter si vous avez la moindre question sur le statut de votre commande.</span>"
+msgid "<span><i>Error,</i> Please be aware that an error occurred during the transaction. The order has been confirmed but will not be paid. Do not hesitate to contact us if you have any questions on the status of your order.</span>"
+msgstr "<span><i>Erreur,</i> une erreur est survenue lors de la transaction. La commande a été confirmée mais ne sera pas réglée. N'hésitez pas à nous contacter pour toute question sur le statut de la commande.</span>"
 
 #. module: payment_payfip
-#: model:payment.acquirer,done_msg:payment_payfip.payment_acquirer_payfip
-msgid "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
-msgstr "<span><i>Fait,</i> votre paiement en ligne a été enregistré. Merci de votre commande.</span>"
+#: model:payment.acquirer,pending_msg:payment_payfip.payment_acquirer_payfip
+msgid "<span><i>Pending,</i> Your online payment has been successfully processed. But your order is not validated yet.</span>"
+msgstr "<span><i>En attente,</i> votre paiement en ligne a été enregistré. Mais votre commande n'est pas encore validée.</span>"
 
 #. module: payment_payfip
 #: selection:payment.transaction,payfip_state:0
@@ -88,9 +88,21 @@ msgid "Abandoned payment (A)"
 msgstr "Paiement abandonné (A)"
 
 #. module: payment_payfip
+#: code:addons/payment_payfip/controllers/main.py:49
+#, python-format
+msgid "Accepted payment, order has been updated."
+msgstr "Paiement accepté, la commande a été mise à jour."
+
+#. module: payment_payfip
 #: model:ir.model.fields,field_description:payment_payfip.field_payment_acquirer_payfip_activation_mode
 msgid "Activation mode"
 msgstr "Mode activation"
+
+#. module: payment_payfip
+#: code:addons/payment_payfip/models/inherited_payment_transaction.py:86
+#, python-format
+msgid "An error occurred, please retry later."
+msgstr "Une erreur est survenue, veuillez réessayer plus tard."
 
 #. module: payment_payfip
 #: model:ir.ui.view,arch_db:payment_payfip.transaction_form_payfip
@@ -130,7 +142,7 @@ msgid "Form action URL"
 msgstr "URL de renvoi du formulaire"
 
 #. module: payment_payfip
-#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:256
+#: code:addons/payment_payfip/models/inherited_payment_acquirer.py:255
 #, python-format
 msgid "It would appear that the customer number entered is not valid or that the PayFIP contract is not properly configured."
 msgstr "Il semblerait que le numéro client n'est pas valide ou que le contrat PayFIP n'est pas correctement configuré."
@@ -193,6 +205,12 @@ msgstr "Intermédiaire de Paiement"
 #: model:ir.model,name:payment_payfip.model_payment_transaction
 msgid "Payment Transaction"
 msgstr "Transaction de paiement"
+
+#. module: payment_payfip
+#: code:addons/payment_payfip/controllers/main.py:50
+#, python-format
+msgid "Payment failure, order has been cancelled."
+msgstr "Paiement échoué, la commande a été annulée."
 
 #. module: payment_payfip
 #: model:ir.model.fields,help:payment_payfip.field_payment_transaction_payfip_operation_identifier

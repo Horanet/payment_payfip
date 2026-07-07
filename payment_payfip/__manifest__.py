@@ -1,6 +1,6 @@
 {
     'name': "Intermédiaire de paiement PayFIP",
-    'version': '11.0.22.08.16',
+    'version': '11.0.26.07.07',
     'summary': """Intermédiaire de paiement : Implémentation de PayFIP""",
     'author': "Horanet",
     'website': "http://www.horanet.com/",
