@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-16 08:42+0000\n"
-"PO-Revision-Date: 2024-04-16 08:42+0000\n"
+"POT-Creation-Date: 2026-07-08 12:58+0000\n"
+"PO-Revision-Date: 2026-07-08 12:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,11 +47,7 @@ msgstr ""
 "</p>"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #, python-format
 msgid ""
@@ -77,11 +73,7 @@ msgid "Abandoned payment (A)"
 msgstr "Paiement abandonné (A)"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/controllers/main.py:0
 #: code:addons/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
 #, python-format
 msgid "Accepted payment, order has been updated."
@@ -91,6 +83,13 @@ msgstr "Paiement accepté, la facture à été mise à jour."
 #: model:ir.model.fields,field_description:payment_payfip.field_payment_acquirer__payfip_activation_mode
 msgid "Activation mode"
 msgstr "Mode activation"
+
+#. module: payment_payfip
+#: code:addons/payment_payfip/models/inherited_payment_transaction.py:0
+#: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
+#, python-format
+msgid "An error occurred, please retry later."
+msgstr "Une erreur est survenue, veuillez réessayer plus tard"
 
 #. module: payment_payfip
 #: model_terms:ir.ui.view,arch_db:payment_payfip.transaction_form_payfip
@@ -130,11 +129,7 @@ msgid "Form action URL"
 msgstr "URL de renvoi du formulaire"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #, python-format
 msgid ""
@@ -164,7 +159,7 @@ msgstr "Autres cas (Z)"
 #: model_terms:ir.ui.view,arch_db:payment_payfip.transaction_form_payfip
 #: model:payment.acquirer,name:payment_payfip.payment_acquirer_payfip
 msgid "PayFIP"
-msgstr "PayFIP"
+msgstr ""
 
 #. module: payment_payfip
 #: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_amount
@@ -182,27 +177,16 @@ msgid "PayFIP: Draft payments recovered"
 msgstr "PayFIP : Paiements en brouillons réévalués"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/payment_payfip/models/inherited_payment_acquirer.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_acquirer.py:0
 #, python-format
 msgid "PayFIP: activation mode can be set in test environment only."
-msgstr "PayFIP : l'activation ne peut être déclenchée qu'en environement de test"
+msgstr ""
+"PayFIP : l'activation ne peut être déclenchée qu'en environement de test"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
 #: code:addons/payment_payfip/models/inherited_payment_transaction.py:0
 #: code:addons/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/models/inherited_payment_transaction.py:0
 #, python-format
@@ -220,11 +204,7 @@ msgid "Payment Transaction"
 msgstr "Transaction"
 
 #. module: payment_payfip
-#: code:addons/odoo/addons/payment_payfip/controllers/main.py:0
 #: code:addons/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/payment_payfip/controllers/main.py:0
-#: code:addons/payment_payfip/setup/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
 #: code:addons/setup/payment_payfip/odoo/addons/payment_payfip/controllers/main.py:0
 #, python-format
 msgid "Payment failure, order has been cancelled."
@@ -238,7 +218,9 @@ msgstr "Fournisseur"
 #. module: payment_payfip
 #: model:ir.model.fields,help:payment_payfip.field_payment_transaction__payfip_operation_identifier
 msgid "Reference of the request of TX as stored in the acquirer database"
-msgstr "Référence de la demande de transaction telle que stockée dans la base de donnée de l'acquéreur."
+msgstr ""
+"Référence de la demande de transaction telle que stockée dans la base de "
+"donnée de l'acquéreur."
 
 #. module: payment_payfip
 #: model:ir.model.fields,field_description:payment_payfip.field_payment_transaction__payfip_return_url
