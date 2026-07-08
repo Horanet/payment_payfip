@@ -1,6 +1,6 @@
 {
     "name": "Intermédiaire de paiement PayFIP",
-    "version": "16.0.0.1.1",
+    "version": "16.0.26.07.07",
     "summary": """Intermédiaire de paiement : Implémentation de PayFIP""",
     "author": "Horanet & Yotech",
     "website": "https://www.yotech.pro/",

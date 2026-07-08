@@ -72,20 +72,9 @@ class PayFIPTransaction(models.Model):
         if self.provider_code != 'payfip':
             return res
 
-        prec = self.env['decimal.precision'].precision_get('Product Price')
-        email = self.partner_email
-        amount = int(float_round(self.amount * 100.0, prec))
-        reference = self.reference.replace('/', ' ')
-        acquirer_reference = "%.15d" % int(uuid.uuid4().int % 899999999999999)
-        self.payfip_acquirer_reference = acquirer_reference
-
-        idop = self.provider_id.payfip_get_id_op_from_web_service(email, amount, reference, acquirer_reference)
-
-        self.payfip_operation_identifier = idop
-
         res['api_url'] = 'https://www.payfip.gouv.fr/tpa/paiementws.web'
-        if idop:
-            res['idop'] = idop
+        if self.payfip_operation_identifier:
+            res['idop'] = self.payfip_operation_identifier
         return res
     # endregion
 
@@ -99,6 +88,49 @@ class PayFIPTransaction(models.Model):
     # endregion
 
     # region Model methods
+    @api.model
+    def _get_specific_create_values(self, provider_code, values):
+        """Override specific create values to add specific fields from payfip.
+
+        Try to get idOp from transaction values and generate the provider reference.
+        If an error occurred during the generation of idOp, raise an Exception to stop the creation of the transaction.
+
+        :param str provider_code: The code of the provider that handled the transaction.
+        :param dict values: The original create values.
+        :return: The dict of provider-specific create values.
+        :rtype: dict
+        """
+        res = super()._get_specific_create_values(provider_code, values)
+        if provider_code != 'payfip':
+            return res
+
+        idop = ''
+        provider_reference = ''
+        provider = self.env['payment.provider'].browse(values['provider_id'])
+        prec = self.env['decimal.precision'].precision_get('Product Price')
+        partner_email = values.get('partner_email', False)
+        amount_val = values.get('amount', 0)
+        reference_val = values.get('reference', '')
+        if partner_email and reference_val and amount_val > 0:
+            amount = int(float_round(amount_val * 100.0, prec))
+            reference = reference_val.replace('/', '  slash  ')
+            provider_reference = '%.15d' % int(uuid.uuid4().int % 899999999999999)
+            idop = provider.payfip_get_id_op_from_web_service(partner_email, amount, reference, provider_reference)
+        else:
+            _logger.error(
+                'An error occurred before idOp negociation with PayFIP web service. '
+                'Missing data in transaction.'
+            )
+
+        if idop:
+            res.update({
+                'payfip_acquirer_reference': provider_reference,
+                'payfip_operation_identifier': idop,
+            })
+        else:
+            raise ValueError(_('An error occurred, please retry later.'))
+        return res
+
     @api.model
     def payfip_cron_check_draft_payment_transactions(self, options={}):
         """Execute cron task to get all draft payments and check actual state
